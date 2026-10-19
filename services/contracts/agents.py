@@ -53,9 +53,12 @@ class StatCitation(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    label: Annotated[str, Field(min_length=1)]
+    label: str
     value: float | str
-    unit: str | None = None
+    unit: str
+    """
+    Unit such as %, km/h, km, xG; empty string when none.
+    """
     source: str
     """
     MCP tool and field, e.g. 'get_team_stats.LAG.possession_pct'.
@@ -129,15 +132,18 @@ class FactCheck(BaseModel):
 
 class StatItem(BaseModel):
     """
-    Same shape as the overlay contract's StatItem.
+    Same shape as the overlay contract's StatItem, but unit is always present (empty when none).
     """
 
     model_config = ConfigDict(
         extra="forbid",
     )
-    label: Annotated[str, Field(min_length=1)]
+    label: str
     value: float | str
-    unit: str | None = None
+    unit: str
+    """
+    Unit such as %, km/h, km, xG; empty string when none.
+    """
 
 
 class Story(BaseModel):
@@ -155,7 +161,7 @@ class Story(BaseModel):
 
 class MomentDecision(BaseModel):
     """
-    Structured output of the Moment Detector model.
+    Structured output of the Moment Detector model. Model output: no length or range keywords (strict structured outputs reject some), so code clamps values.
     """
 
     model_config = ConfigDict(
@@ -173,71 +179,71 @@ class MomentDecision(BaseModel):
         "half_time",
         "full_time",
     ]
-    importance: Annotated[float, Field(ge=0.0, le=1.0)]
-    summary: Annotated[str, Field(max_length=200)]
+    importance: float
+    summary: str
 
 
 class InsightDraft(BaseModel):
     """
-    Structured output of the Tactical Analyst model.
+    Structured output of the Tactical Analyst model. Model output: no length or range keywords (strict structured outputs reject some), so code clamps values.
     """
 
     model_config = ConfigDict(
         extra="forbid",
     )
-    headline: Annotated[str, Field(max_length=120)]
-    why_it_matters: Annotated[str, Field(max_length=500)]
+    headline: str
+    why_it_matters: str
     stats_cited: list[StatCitation]
 
 
 class CommentaryDraft(BaseModel):
     """
-    Structured output of the Narrator model.
+    Structured output of the Narrator model. Model output: no length or range keywords (strict structured outputs reject some), so code clamps values.
     """
 
     model_config = ConfigDict(
         extra="forbid",
     )
-    text: Annotated[str, Field(max_length=900)]
+    text: str
     stats_cited: list[StatCitation]
 
 
 class CardText(BaseModel):
     """
-    Structured output of the Fan Lens and Localizer models.
+    Structured output of the Fan Lens and Localizer models. Model output: no length or range keywords (strict structured outputs reject some), so code clamps values.
     """
 
     model_config = ConfigDict(
         extra="forbid",
     )
-    title: Annotated[str, Field(max_length=120)]
-    body: Annotated[str, Field(max_length=600)]
-    stats: Annotated[list[StatItem], Field(max_length=4)]
+    title: str
+    body: str
+    stats: list[StatItem]
 
 
 class ClaimCheck(BaseModel):
     """
-    Structured output of the Fact Checker model (qualitative claims; numbers are checked in code).
+    Structured output of the Fact Checker model (qualitative claims; numbers are checked in code). Model output: no length or range keywords (strict structured outputs reject some), so code clamps values.
     """
 
     model_config = ConfigDict(
         extra="forbid",
     )
     verdict: Literal["pass", "reject"]
-    reason: Annotated[str, Field(max_length=300)]
+    reason: str
 
 
 class ProducerPlan(BaseModel):
     """
-    Structured output of the Producer model: where and how long a card shows.
+    Structured output of the Producer model: where and how long a card shows. Model output: no length or range keywords (strict structured outputs reject some), so code clamps values.
     """
 
     model_config = ConfigDict(
         extra="forbid",
     )
     slot: Literal["lower_third", "corner_bug", "player_tag", "full_card", "ticker"]
-    priority: Annotated[int, Field(ge=1, le=5)]
-    ttl_s: Annotated[int, Field(ge=4, le=60)]
+    priority: int
+    ttl_s: int
 
 
 class AgentTrace(BaseModel):

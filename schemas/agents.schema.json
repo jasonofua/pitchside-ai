@@ -208,12 +208,12 @@
       "required": [
         "label",
         "value",
+        "unit",
         "source"
       ],
       "properties": {
         "label": {
-          "type": "string",
-          "minLength": 1
+          "type": "string"
         },
         "value": {
           "type": [
@@ -222,7 +222,8 @@
           ]
         },
         "unit": {
-          "type": "string"
+          "type": "string",
+          "description": "Unit such as %, km/h, km, xG; empty string when none."
         },
         "source": {
           "description": "MCP tool and field, e.g. 'get_team_stats.LAG.possession_pct'.",
@@ -487,17 +488,17 @@
       }
     },
     "StatItem": {
-      "description": "Same shape as the overlay contract's StatItem.",
+      "description": "Same shape as the overlay contract's StatItem, but unit is always present (empty when none).",
       "type": "object",
       "additionalProperties": false,
       "required": [
         "label",
-        "value"
+        "value",
+        "unit"
       ],
       "properties": {
         "label": {
-          "type": "string",
-          "minLength": 1
+          "type": "string"
         },
         "value": {
           "type": [
@@ -506,7 +507,8 @@
           ]
         },
         "unit": {
-          "type": "string"
+          "type": "string",
+          "description": "Unit such as %, km/h, km, xG; empty string when none."
         }
       }
     },
@@ -530,7 +532,7 @@
       }
     },
     "MomentDecision": {
-      "description": "Structured output of the Moment Detector model.",
+      "description": "Structured output of the Moment Detector model. Model output: no length or range keywords (strict structured outputs reject some), so code clamps values.",
       "type": "object",
       "additionalProperties": false,
       "required": [
@@ -547,18 +549,15 @@
           "$ref": "#/$defs/MomentKind"
         },
         "importance": {
-          "type": "number",
-          "minimum": 0,
-          "maximum": 1
+          "type": "number"
         },
         "summary": {
-          "type": "string",
-          "maxLength": 200
+          "type": "string"
         }
       }
     },
     "InsightDraft": {
-      "description": "Structured output of the Tactical Analyst model.",
+      "description": "Structured output of the Tactical Analyst model. Model output: no length or range keywords (strict structured outputs reject some), so code clamps values.",
       "type": "object",
       "additionalProperties": false,
       "required": [
@@ -568,12 +567,10 @@
       ],
       "properties": {
         "headline": {
-          "type": "string",
-          "maxLength": 120
+          "type": "string"
         },
         "why_it_matters": {
-          "type": "string",
-          "maxLength": 500
+          "type": "string"
         },
         "stats_cited": {
           "type": "array",
@@ -584,7 +581,7 @@
       }
     },
     "CommentaryDraft": {
-      "description": "Structured output of the Narrator model.",
+      "description": "Structured output of the Narrator model. Model output: no length or range keywords (strict structured outputs reject some), so code clamps values.",
       "type": "object",
       "additionalProperties": false,
       "required": [
@@ -593,8 +590,7 @@
       ],
       "properties": {
         "text": {
-          "type": "string",
-          "maxLength": 900
+          "type": "string"
         },
         "stats_cited": {
           "type": "array",
@@ -605,7 +601,7 @@
       }
     },
     "CardText": {
-      "description": "Structured output of the Fan Lens and Localizer models.",
+      "description": "Structured output of the Fan Lens and Localizer models. Model output: no length or range keywords (strict structured outputs reject some), so code clamps values.",
       "type": "object",
       "additionalProperties": false,
       "required": [
@@ -615,16 +611,13 @@
       ],
       "properties": {
         "title": {
-          "type": "string",
-          "maxLength": 120
+          "type": "string"
         },
         "body": {
-          "type": "string",
-          "maxLength": 600
+          "type": "string"
         },
         "stats": {
           "type": "array",
-          "maxItems": 4,
           "items": {
             "$ref": "#/$defs/StatItem"
           }
@@ -632,7 +625,7 @@
       }
     },
     "ClaimCheck": {
-      "description": "Structured output of the Fact Checker model (qualitative claims; numbers are checked in code).",
+      "description": "Structured output of the Fact Checker model (qualitative claims; numbers are checked in code). Model output: no length or range keywords (strict structured outputs reject some), so code clamps values.",
       "type": "object",
       "additionalProperties": false,
       "required": [
@@ -648,13 +641,12 @@
           ]
         },
         "reason": {
-          "type": "string",
-          "maxLength": 300
+          "type": "string"
         }
       }
     },
     "ProducerPlan": {
-      "description": "Structured output of the Producer model: where and how long a card shows.",
+      "description": "Structured output of the Producer model: where and how long a card shows. Model output: no length or range keywords (strict structured outputs reject some), so code clamps values.",
       "type": "object",
       "additionalProperties": false,
       "required": [
@@ -674,14 +666,10 @@
           ]
         },
         "priority": {
-          "type": "integer",
-          "minimum": 1,
-          "maximum": 5
+          "type": "integer"
         },
         "ttl_s": {
-          "type": "integer",
-          "minimum": 4,
-          "maximum": 60
+          "type": "integer"
         }
       }
     }
