@@ -71,3 +71,66 @@ e.g. `LAG-09`.
 Creating the **public GitHub repo** and provisioning the **Foundry project and model
 deployments** need credentials this environment doesn't have (no `gh`, `az` or `azd` CLI).
 Everything else in Day 1 is done; these two are listed in PROGRESS.md as actions for the owner.
+
+## Day 2 (worked Oct 19-20, 2026)
+
+### D11. How the Stats Engine defines its numbers
+- **Possession** is the share of ball-in-play time, credited between consecutive events to
+  the team in possession (gaps capped at 8 s); play stops at out-of-play, fouls, goals and
+  period ends. **Turnovers** are possession changes, except those after the losing team's
+  own shot.
+- **Pass difficulty** (0-100): distance (30 pts, linear to 40 m), passer under pressure
+  (20), opponents bypassed (25, full at 5+) and space at the target (25, full at 1.5 m or
+  less, none at 9 m+), using the latest tracking frame. Without tracking, line-breaking
+  falls back to 20 m+ forward and tightness scores a neutral 12.5.
+- **xG** is the distance + angle logistic model with the engine's coefficients for an
+  average finisher, discounted for headers, pressure and direct free kicks; penalties 0.76.
+- **PPDA**: opponent passes in their first 60% of the pitch per tackle, interception or
+  foul in that zone.
+- **Control vs Chaos** blends possession stability (passes per possession, 35%), turnover
+  rate (30%), pressure rate (20%) and forward tempo (15%) over the last 5 minutes, every
+  30 s of match time. Baselines are the medians from `scripts/calibrate_stats.py` and the
+  scales about five standard deviations, so a typical window sits near 0 and a swing of 30+
+  in 5 minutes happens about 6 times a match. The dominant team is the one with more than
+  55% of the ball in the window.
+- **Speed** is smoothed over three 5 Hz samples (0.6 s). The >32 km/h trigger fires once
+  per sprint and at most once per player per 5 minutes; a sprint is 25.2 km/h for 1 s+.
+- **Triggers** also fire on goals, cards, half time, full time, an xG above 0.3, a
+  completed pass above 80 difficulty, a momentum swing of 30+ (3-minute cooldown) and every
+  30 s of match time (the Moment Detector's heartbeat).
+
+### D12. MCP tool signatures
+Every tool takes `match_id` first, because one server serves every live match. Windows
+are `match | first_half | second_half | last_5 | last_10 | last_15`. `get_events(since)`
+uses event `seq` (the clock is ambiguous across halves). `get_player_stats` leaves out the
+96-cell heat map unless `include_heatmap` is set, to keep agent context small. The server
+is stateless Streamable HTTP with JSON responses.
+
+### D13. Dependency pins
+- `mcp` stays on 1.x (1.30): Agent Framework 1.22's MCP tools import 1.x modules and the
+  framework's extras pin `mcp<2`.
+- `cryptography<49`: 49+ ships no Intel macOS wheel, so uv compiled it from Rust source on
+  the dev machine. 48.0.1 has universal2 wheels; revisit when the Intel Macs go.
+
+### D14. The Stats Engine and the MCP server share a process
+The MCP server answers from in-memory StatsEngines, so in Azure the stats service and the
+MCP server run in the same Container App. The event log is in Cosmos DB, so a restarted or
+new replica rebuilds any match on demand (tracking-derived numbers restart from zero).
+
+### D15. Scenario scripts
+Scenarios are YAML validated by `schemas/scenario.schema.json`. Beats can set team
+modifiers, schedule a goal or force a straight red. With `scoring: scripted` only goal
+beats score, and an otherwise-scoring shot becomes a save, so every seed tells the same
+story (the comeback is always 0-2 at the hour, then 2-2). All four scenarios from the spec
+are done, not just the two Day 2 asked for. Scripted goals land within about two minutes
+of their minute.
+
+### D16. Bus messages
+Messages are JSON dicts in both modes. Models are dumped with `exclude_unset`, so
+optional fields the JSON Schemas forbid as null are left out, while nullable stats (e.g.
+PPDA before any defensive action) stay as null. In local mode every subscriber gets every
+message on its topic; Event Hubs consumer groups give the same fan-out in Azure.
+
+### D17. Overlay contract extensions
+`OverlayCard` gains optional `kind`, `source` (agent or template), `player_id` (where a
+player tag goes) and `team_id` (club colours). Renderers that ignore them still work.

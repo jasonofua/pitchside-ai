@@ -196,11 +196,11 @@ The rule: a working end-to-end slice by Day 3, then widen. Day 8 is for the vide
 
 ### Day 2 — Wed Oct 21: numbers
 
-- [ ] Stats engine with unit tests for every metric, including pass difficulty and xG
-- [ ] Control vs Chaos index over a 5-minute window, with threshold triggers
-- [ ] Match Stats MCP server exposing the six tools
-- [ ] Local bus (in-process) + Ingestor; Cosmos DB emulator or SQLite in local mode
-- [ ] Scenario scripts: comeback and late winner
+- [x] Stats engine with unit tests for every metric, including pass difficulty and xG
+- [x] Control vs Chaos index over a 5-minute window, with threshold triggers
+- [x] Match Stats MCP server exposing the six tools
+- [x] Local bus (in-process) + Ingestor; Cosmos DB emulator or SQLite in local mode
+- [x] Scenario scripts: comeback and late winner (plus red_card and pressing_collapse)
 
 ### Day 3 — Thu Oct 22: first agents, first slice
 

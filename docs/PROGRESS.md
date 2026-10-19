@@ -39,3 +39,31 @@
 PPDA), Control vs Chaos index and threshold triggers, Match Stats MCP server (six tools),
 in-process bus + Ingestor with SQLite in local mode, and the `comeback` and `late_winner`
 scenario scripts (the engine's `TeamModifiers` are the hook for them).
+
+## Day 2 — numbers (worked Oct 19-20)
+
+**Done**
+- Stats Engine (`services/stats`): possession, pass accuracy, distance, speed and difficulty,
+  shot speed, xG, PPDA, turnovers, distance covered, sprints, top speed, key passes, heat
+  maps, shot map, pass network, difficulty histogram; windows for the match, each half and
+  the last 5/10/15 minutes. Unit tests for every metric.
+- Control vs Chaos index every 30 s over a 5-minute window, calibrated on simulated matches
+  (`scripts/calibrate_stats.py`), with speed, pass-difficulty, xG, goal, card, period,
+  momentum-swing and tick triggers. Per match: about 11 sprint triggers, 3 hard passes,
+  2 big chances, 6 momentum swings.
+- Match Stats MCP server (`services/mcp_stats`) with the six tools, tested through a real
+  MCP client over Streamable HTTP.
+- Local bus, SQLite event log, Ingestor (JSON Schema validation, de-duplication) and stats
+  service; a full match flows sim → bus → Ingestor → Stats Engine in tests.
+- Scenario scripts: comeback, late_winner, red_card and pressing_collapse, each tested over
+  10 seeds. `python -m sim run --scenario comeback` uses the scenario's clubs.
+- 199 tests pass; ruff, format and mypy (strict) are clean.
+
+**Broken / not done**
+- Still no public GitHub repo or Azure resources (see Day 1 owner actions).
+- The dev machine's network is slow (PyPI downloads at ~30 KB/s), so dependency installs
+  take 15+ minutes; nothing to fix in the repo.
+
+**Next (Day 3)**: Agent Framework workflow with typed messages and trace ids; Moment
+Detector, Tactical Analyst and Narrator reading through the MCP server; gateway WebSocket
+pushing overlay JSON; one match explained end to end in a terminal.
