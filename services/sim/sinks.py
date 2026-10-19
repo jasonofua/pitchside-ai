@@ -130,3 +130,63 @@ class FileSink:
         meta = {**self.meta, "counts": self.counts, "score": self.score}
         meta_path = self.out_dir / f"{self.match_id}.meta.json"
         meta_path.write_text(json.dumps(meta, indent=2) + "\n")
+
+
+class WsSink:
+    """Streams envelopes to a running gateway's /ws/ingest socket (the CLI's `--sink ws`).
+
+    The first message is the MatchInfo, so the gateway's services know the teams.
+    """
+
+    def __init__(self, url: str, info: dict[str, Any]) -> None:
+        from websockets.sync.client import connect
+
+        self.ws = connect(url, max_size=None)
+        self.ws.send(json.dumps({"topic": "match", "data": info}))
+
+    def emit(self, topic: Topic, item: MatchEvent | TrackingFrame) -> None:
+        data = item.model_dump_json(exclude_none=True)
+        self.ws.send(f'{{"topic":"{topic}","data":{data}}}')
+
+    def close(self) -> None:
+        self.ws.close()
+
+
+class EventHubsSink:
+    """Publishes to Azure Event Hubs (the CLI's `--sink eventhubs`), authenticating with
+    DefaultAzureCredential (managed identity, or `az login` on a laptop)."""
+
+    def __init__(self, namespace: str, info: dict[str, Any]) -> None:
+        from azure.eventhub import EventData, EventHubProducerClient
+        from azure.identity import DefaultAzureCredential
+
+        self._event = EventData
+        fqns = namespace if "." in namespace else f"{namespace}.servicebus.windows.net"
+        credential = DefaultAzureCredential()
+        self.key = str(info["match_id"])
+        self.producers = {
+            name: EventHubProducerClient(
+                fully_qualified_namespace=fqns, eventhub_name=name, credential=credential,
+                buffered_mode=True, max_wait_time=0.05, on_error=self._on_error,
+                on_success=self._on_success,
+            )
+            for name in ("matches", "events", "tracking")
+        }  # fmt: skip
+        live = {**info, "status": "live"}
+        self.producers["matches"].send_event(EventData(json.dumps(live)), partition_key=self.key)
+
+    @staticmethod
+    def _on_error(events: Any, partition: str | None, error: Exception) -> None:
+        raise RuntimeError(f"event hubs send failed: {error}")
+
+    @staticmethod
+    def _on_success(events: Any, partition: str | None) -> None:
+        return None
+
+    def emit(self, topic: Topic, item: MatchEvent | TrackingFrame) -> None:
+        body = item.model_dump_json(exclude_none=True)
+        self.producers[topic].send_event(self._event(body), partition_key=self.key)
+
+    def close(self) -> None:
+        for producer in self.producers.values():
+            producer.close(flush=True)

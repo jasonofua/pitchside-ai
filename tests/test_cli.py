@@ -68,8 +68,8 @@ def test_jsonl_sink_envelope(tmp_path: Path) -> None:
 @pytest.mark.parametrize(
     "args",
     [
-        ["run", "--sink", "ws"],
-        ["run", "--sink", "eventhubs"],
+        ["run", "--sink", "ws", "--ws-url", "ws://127.0.0.1:9/ws/ingest"],  # nothing listening
+        ["run", "--sink", "eventhubs", "--eventhubs-namespace", ""],
         ["run", "--scenario", "nope"],
         ["run", "--home", "XYZ"],
         ["run", "--home", "LAG", "--away", "LAG"],

@@ -11,14 +11,19 @@ from sim import __version__
 from sim.engine import MatchConfig
 from sim.runner import run_match
 from sim.scenario import load_scenario, scenario_names
-from sim.sinks import TOPICS, FileSink, JsonlSink, PrettySink, Sink, Topic
+from sim.sinks import (
+    TOPICS,
+    EventHubsSink,
+    FileSink,
+    JsonlSink,
+    PrettySink,
+    Sink,
+    Topic,
+    WsSink,
+)
 from sim.world import REPO_ROOT, load_world
 
 DEFAULT_HOME, DEFAULT_AWAY = "LAG", "HCF"
-PLANNED_SINKS = {
-    "ws": "the WebSocket sink arrives with the gateway (build plan Day 3)",
-    "eventhubs": "the Event Hubs sink arrives with the Azure deployment (build plan Day 7)",
-}
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -57,6 +62,14 @@ def build_parser() -> argparse.ArgumentParser:
         "--out", type=Path, default=REPO_ROOT / "data" / "matches", help="file sink dir"
     )
     run.add_argument("--halftime-s", type=float, default=10.0, help="wall-clock half-time pause")
+    run.add_argument(
+        "--ws-url", default="ws://localhost:8000/ws/ingest", help="gateway ingest socket (ws sink)"
+    )
+    run.add_argument(
+        "--eventhubs-namespace",
+        default=os.environ.get("EVENTHUBS_NAMESPACE", ""),
+        help="Event Hubs namespace (eventhubs sink)",
+    )
     run.add_argument("--world", type=Path, help="world file (default: data/world.json)")
 
     teams = commands.add_parser("teams", help="list the fictional clubs")
@@ -83,8 +96,6 @@ def _cmd_teams(args: argparse.Namespace) -> int:
 
 
 def _cmd_run(parser: argparse.ArgumentParser, args: argparse.Namespace) -> int:
-    if args.sink in PLANNED_SINKS:
-        parser.error(f"--sink {args.sink} is not implemented yet: {PLANNED_SINKS[args.sink]}")
     if args.scenario not in scenario_names():
         parser.error(
             f"unknown scenario {args.scenario!r}; available: {', '.join(scenario_names())}"
@@ -99,6 +110,11 @@ def _cmd_run(parser: argparse.ArgumentParser, args: argparse.Namespace) -> int:
         parser.error("--speed must be >= 0")
     topics = _parse_topics(parser, args.topics)
     world = load_world(args.world)
+    if args.sink in ("ws", "eventhubs") and not args.match_id:
+        from sim.service import fresh_match_id
+
+        # Live runs need a fresh id, or the Ingestor would drop them as duplicates.
+        args.match_id = fresh_match_id(args.home, args.away, args.scenario, args.seed)
     config = MatchConfig(
         home=args.home, away=args.away, seed=args.seed, scenario=args.scenario,
         match_id=args.match_id,
@@ -115,7 +131,20 @@ def _cmd_run(parser: argparse.ArgumentParser, args: argparse.Namespace) -> int:
         parser.error(str(exc.args[0]))
 
     sink: Sink
-    if args.sink == "file":
+    if args.sink in ("ws", "eventhubs"):
+        from sim.live import new_match_info
+
+        info = new_match_info(config, args.speed).model_dump(mode="json", exclude_none=True)
+        if args.sink == "ws":
+            try:
+                sink = WsSink(args.ws_url, info)
+            except OSError as exc:
+                parser.error(f"cannot reach the gateway at {args.ws_url}: {exc}")
+        else:
+            if not args.eventhubs_namespace:
+                parser.error("--sink eventhubs needs --eventhubs-namespace or EVENTHUBS_NAMESPACE")
+            sink = EventHubsSink(args.eventhubs_namespace, info)
+    elif args.sink == "file":
         meta = {
             "match_id": match_id,
             "seed": args.seed,
@@ -134,6 +163,8 @@ def _cmd_run(parser: argparse.ArgumentParser, args: argparse.Namespace) -> int:
     run_match(world, config, sink, speed=args.speed, topics=topics, halftime_s=args.halftime_s)
     if args.sink == "file":
         print(f"wrote {match_id} to {args.out}", file=sys.stderr)
+    elif args.sink in ("ws", "eventhubs"):
+        print(f"streamed {config.resolved_match_id()} to {args.sink}", file=sys.stderr)
     return 0
 
 
