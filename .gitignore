@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+
+# Node (web/, from Day 5)
+node_modules/
+.next/
+.pnpm-store/
+
+# Local config and secrets
+.env
+.env.*
+!.env.example
+.azure/
+
+# Tracking exports are large; regenerate with `python -m sim run --sink file`.
+data/matches/*.tracking.jsonl.gz
+
+# OS / editors
+.DS_Store
+.idea/
+.vscode/

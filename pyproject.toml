@@ -1,0 +1,56 @@
+[project]
+name = "pitchside-ai"
+version = "0.1.0"
+description = "Multi-agent live match intelligence over a synthetic football match engine."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "pydantic>=2.14.1",
+]
+
+[project.scripts]
+pitchside-sim = "sim.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["services/sim", "services/contracts"]
+
+[dependency-groups]
+dev = [
+    "datamodel-code-generator>=0.86.0",
+    "jsonschema>=4.26.0",
+    "mypy>=2.4.0",
+    "pytest>=9.1.1",
+    "ruff>=0.17.1",
+    "types-jsonschema>=4.26.0.20261006",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["services", "tests", "scripts"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM", "RUF", "N"]
+
+[tool.ruff.lint.per-file-ignores]
+"services/contracts/*.py" = ["E501", "RUF"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["sim", "contracts"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+mypy_path = "services"
+packages = ["sim", "contracts"]
+plugins = ["pydantic.mypy"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+markers = ["slow: runs many full simulated matches"]
