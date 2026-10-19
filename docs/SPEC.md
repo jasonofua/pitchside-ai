@@ -204,10 +204,10 @@ The rule: a working end-to-end slice by Day 3, then widen. Day 8 is for the vide
 
 ### Day 3 — Thu Oct 22: first agents, first slice
 
-- [ ] Agent Framework workflow skeleton with typed messages and trace ids
-- [ ] Moment Detector, Tactical Analyst, Narrator working through the MCP server
-- [ ] Gateway WebSocket pushing raw overlay JSON
-- [ ] **Milestone:** one simulated match produces explained moments end to end in a terminal
+- [x] Agent Framework workflow skeleton with typed messages and trace ids
+- [x] Moment Detector, Tactical Analyst, Narrator working through the MCP server
+- [x] Gateway WebSocket pushing raw overlay JSON
+- [x] **Milestone:** one simulated match produces explained moments end to end in a terminal (`scripts/explain_match.py`)
 
 ### Day 4 — Fri Oct 23: the rest of the crew
 

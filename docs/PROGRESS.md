@@ -67,3 +67,30 @@ scenario scripts (the engine's `TeamModifiers` are the hook for them).
 **Next (Day 3)**: Agent Framework workflow with typed messages and trace ids; Moment
 Detector, Tactical Analyst and Narrator reading through the MCP server; gateway WebSocket
 pushing overlay JSON; one match explained end to end in a terminal.
+
+## Day 3 — first agents, first slice (worked Oct 20)
+
+**Done**
+- Agent Framework workflow (`services/agents/workflow.py`): Moment Detector → Tactical
+  Analyst → Narrator → Fan Lens → Localizer → Fact Checker → Producer, typed messages
+  with trace and moment ids, one workflow per trigger.
+- All seven agents (Day 4's four included), with versioned prompts in
+  `services/agents/prompts`, reading stats only through the Match Stats MCP server.
+- Failure handling (also Day 4): instant stats-only cards, 4 s soft / 20 s hard budgets
+  with upgrade in place, circuit breakers, chaos switch, wrong-number fault injection,
+  one regeneration then fallback, stale-card dropping.
+- Gateway: REST, WebSocket fan-out filtered per profile, Director API, ingest socket,
+  Web PubSub path for Azure; `python -m runtime.main` runs everything locally.
+- Milestone: `uv run python scripts/explain_match.py --scenario comeback` explains a whole
+  match in the terminal; a live match also streams to a WebSocket client with agent cards
+  in English, Pidgin and Yoruba.
+- Azure adapters written (Event Hubs bus, Cosmos DB store); untested until there is a
+  subscription.
+
+**Broken / not done**
+- No real model has been called yet: no Foundry or other endpoint is configured here. The
+  offline mock covers local mode and tests; the first run against Foundry needs the owner's
+  deployments (the prompts are written for them).
+
+**Next (Day 4)**: evals for every agent (30 seeded moments, number accuracy and language
+quality), then the native-speaker review list for Pidgin and Yoruba.

@@ -134,3 +134,60 @@ message on its topic; Event Hubs consumer groups give the same fan-out in Azure.
 ### D17. Overlay contract extensions
 `OverlayCard` gains optional `kind`, `source` (agent or template), `player_id` (where a
 player tag goes) and `team_id` (club colours). Renderers that ignore them still work.
+
+## Day 3 (worked Oct 20, 2026)
+
+### D18. Model clients
+Agents use Agent Framework's `FoundryChatClient` against the Foundry project
+(`FOUNDRY_ENDPOINT`, deployments `MODEL_LARGE` / `MODEL_SMALL`, managed identity).
+Locally, `OPENAI_COMPAT_BASE_URL` switches to `OpenAIChatCompletionClient` for any
+OpenAI-compatible server; with neither set, an offline mock chat client is used. The mock
+is a real Agent Framework client (function-invocation, middleware and telemetry layers)
+that asks for MCP tools through the same function-calling loop and writes from a phrase
+bank, so local mode and CI exercise the whole pipeline without a model. Model output uses
+strict JSON-schema response formats, which is why the output schemas carry no length or
+range keywords (code clamps instead).
+
+### D19. When the models are not called
+- Goals and period ends are moments by rule; the Moment Detector model is skipped.
+- Ticks in the first 5 minutes of a half are skipped (the 5-minute window is not full),
+  and at most one "spell" moment is explained per 5 minutes of match time.
+- With nobody watching a match, ticks, sprints and hard passes are skipped; goals, cards,
+  big chances, momentum swings and period ends still run (they feed the dashboard and the
+  recap).
+- The Analyst runs for importance 0.5+ or a momentum swing of 30+; the Narrator for
+  insights, goals, cards and period ends; the Producer's model only for agent cards of
+  importance 0.8+ (house rules plan the rest).
+
+### D20. Template first, upgrade in place
+Goals, cards, big chances, sprints, hard passes, momentum swings and period ends publish
+a stats-only card for every viewer as soon as the trigger arrives (well under 1 s). The
+agents' card for the same moment and viewer reuses its overlay id, so it replaces the
+template on screen. Each model call has a 4 s soft budget (after which the template goes
+out if it has not already) and a 20 s hard budget; three failures in 60 s open an agent's
+circuit breaker for 30 s. The Producer drops a card once the match clock has passed its
+moment by more than its ttl. The chaos switch makes an agent unavailable for N seconds.
+
+### D21. What the Fact Checker checks against
+Code extracts every figure (percentages, km/h, km, m, xG, difficulty, index points,
+minutes, scorelines, plain counts) and requires a match of the same kind within the
+precision the card used. The reference set is fresh MCP reads plus every MCP result the
+writers received in this run (recorded by a function middleware), so a card is not
+rejected just because the match moved on while it was being written. Derived numbers
+(sums, differences) are rejected. The small model then checks the words around the
+numbers. One regeneration with the correction in context, then the stats-only card.
+
+### D22. Workflow shape and latency
+The chain is linear as in the spec, one workflow instance per trigger (Agent Framework
+forbids concurrent runs of one instance), at most four in flight per match. The Fan Lens
+writes each viewer's card concurrently and the Localizer, Fact Checker and Producer then
+handle each card independently. Explained cards arrive about 4-8 s after the event with
+cloud models; the instant stats-only card covers the gap.
+
+### D23. Gateway topology
+Local mode: one process runs the simulator service, Ingestor, Stats Engine + MCP server,
+agents and gateway (`python -m runtime.main --role all`). Azure: one Container App per
+role on Event Hubs and Cosmos DB; the gateway reads stats from the stats app over HTTP
+and delivers through Web PubSub groups per match, per profile and for admins. The
+simulator CLI's `--sink ws` posts to `/ws/ingest`, which is open in local mode and needs
+`PITCHSIDE_INGEST_TOKEN` in Azure.
