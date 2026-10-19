@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:pitchside:schema:tracking:1",
+  "title": "TrackingFrame",
+  "description": "Positions of every on-pitch player and the ball, sampled at 5 Hz. Unlike events, coordinates are absolute: the home team attacks left to right (towards x=105) for the whole match.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["match_id", "clock_ms", "period", "players", "ball"],
+  "properties": {
+    "match_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "clock_ms": {
+      "description": "Displayed match clock in ms, on a 200 ms grid.",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 7200000
+    },
+    "period": {
+      "description": "Needed because stoppage time in period 1 overlaps the period 2 clock.",
+      "type": "integer",
+      "enum": [1, 2]
+    },
+    "players": {
+      "type": "array",
+      "maxItems": 22,
+      "items": { "$ref": "#/$defs/PlayerPosition" }
+    },
+    "ball": {
+      "$ref": "#/$defs/BallPosition"
+    }
+  },
+  "$defs": {
+    "PlayerPosition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["player_id", "x", "y"],
+      "properties": {
+        "player_id": { "type": "string", "minLength": 1 },
+        "x": { "type": "number", "minimum": 0, "maximum": 105 },
+        "y": { "type": "number", "minimum": 0, "maximum": 68 }
+      }
+    },
+    "BallPosition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y"],
+      "properties": {
+        "x": { "type": "number", "minimum": 0, "maximum": 105 },
+        "y": { "type": "number", "minimum": 0, "maximum": 68 }
+      }
+    }
+  }
+}

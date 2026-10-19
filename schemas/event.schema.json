@@ -1,0 +1,169 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:pitchside:schema:event:1",
+  "title": "MatchEvent",
+  "description": "One on-ball or match-control event from the synthetic match engine. Coordinates are in metres on a 105 x 68 pitch, relative to the acting team (team_id) attacking left to right: x=0 is their own goal line, x=105 the opponent's, y=0 is the touchline on their left. See docs/DECISIONS.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "event_id",
+    "match_id",
+    "seq",
+    "clock_ms",
+    "period",
+    "type",
+    "x",
+    "y",
+    "under_pressure"
+  ],
+  "properties": {
+    "event_id": {
+      "description": "ULID, unique and lexicographically sortable in emission order.",
+      "type": "string",
+      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    },
+    "match_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "seq": {
+      "description": "Strictly increasing per match, starting at 0.",
+      "type": "integer",
+      "minimum": 0
+    },
+    "clock_ms": {
+      "description": "Displayed match clock in ms. Period 2 starts at 2700000 (45:00); stoppage time runs past 45:00 / 90:00.",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 7200000
+    },
+    "period": {
+      "type": "integer",
+      "enum": [1, 2]
+    },
+    "type": {
+      "$ref": "#/$defs/EventType"
+    },
+    "team_id": {
+      "description": "Acting team. Absent only for period_end.",
+      "type": "string",
+      "minLength": 1
+    },
+    "player_id": {
+      "description": "Acting player. For substitution, the player leaving the pitch. Absent only for period_end.",
+      "type": "string",
+      "minLength": 1
+    },
+    "x": { "$ref": "#/$defs/PitchX" },
+    "y": { "$ref": "#/$defs/PitchY" },
+    "end_x": { "$ref": "#/$defs/PitchX" },
+    "end_y": { "$ref": "#/$defs/PitchY" },
+    "outcome": {
+      "$ref": "#/$defs/Outcome"
+    },
+    "under_pressure": {
+      "description": "True when an opponent applied pressure on the actor immediately before this event.",
+      "type": "boolean"
+    },
+    "ball_speed_kmh": {
+      "description": "Initial ball speed for passes and shots.",
+      "type": "number",
+      "minimum": 0,
+      "maximum": 200
+    },
+    "recipient_id": {
+      "description": "Intended receiver of a pass, or the player coming on for a substitution.",
+      "type": "string",
+      "minLength": 1
+    },
+    "body_part": {
+      "$ref": "#/$defs/BodyPart"
+    },
+    "card_color": {
+      "$ref": "#/$defs/CardColor"
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "type": { "not": { "const": "period_end" } } } },
+      "then": { "required": ["team_id", "player_id"] }
+    },
+    {
+      "if": { "properties": { "type": { "enum": ["pass", "carry", "shot"] } } },
+      "then": { "required": ["end_x", "end_y"] }
+    },
+    {
+      "if": { "properties": { "type": { "const": "pass" } } },
+      "then": {
+        "required": ["outcome", "ball_speed_kmh", "recipient_id"],
+        "properties": { "outcome": { "enum": ["complete", "incomplete"] } }
+      }
+    },
+    {
+      "if": { "properties": { "type": { "const": "shot" } } },
+      "then": {
+        "required": ["outcome", "ball_speed_kmh", "body_part"],
+        "properties": { "outcome": { "enum": ["complete", "saved", "blocked", "off_target"] } }
+      }
+    },
+    {
+      "if": { "properties": { "type": { "enum": ["tackle", "interception"] } } },
+      "then": {
+        "required": ["outcome"],
+        "properties": { "outcome": { "enum": ["won", "lost"] } }
+      }
+    },
+    {
+      "if": { "properties": { "type": { "const": "card" } } },
+      "then": { "required": ["card_color"] }
+    },
+    {
+      "if": { "properties": { "type": { "const": "substitution" } } },
+      "then": { "required": ["recipient_id"] }
+    }
+  ],
+  "$defs": {
+    "EventType": {
+      "type": "string",
+      "enum": [
+        "pass",
+        "carry",
+        "shot",
+        "tackle",
+        "interception",
+        "pressure",
+        "foul",
+        "card",
+        "substitution",
+        "goal",
+        "possession_change",
+        "out_of_play",
+        "kickoff",
+        "period_end"
+      ]
+    },
+    "Outcome": {
+      "description": "For shots, 'complete' means the shot was scored (a goal event follows).",
+      "type": "string",
+      "enum": ["complete", "incomplete", "saved", "blocked", "off_target", "won", "lost"]
+    },
+    "BodyPart": {
+      "type": "string",
+      "enum": ["right_foot", "left_foot", "head", "other"]
+    },
+    "CardColor": {
+      "type": "string",
+      "enum": ["yellow", "second_yellow", "red"]
+    },
+    "PitchX": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 105
+    },
+    "PitchY": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 68
+    }
+  }
+}
