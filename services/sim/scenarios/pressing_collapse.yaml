@@ -1,0 +1,24 @@
+# A high-press team tires after 65' and turnovers spike.
+name: pressing_collapse
+description: >-
+  Northbank Rovers press high and dominate the first hour; after 65' their legs go, their
+  passing breaks down and Kestrel Vale Athletic run at them.
+home: NBR
+away: KVA
+favourite: home
+scoring: free
+beats:
+  - at: "0"
+    kind: modifiers
+    team: home
+    modifiers: { press: 1.35, fatigue: 1.4, attack: 1.1 }
+    note: Full-throttle press from the first whistle.
+  - at: "65"
+    kind: modifiers
+    team: home
+    modifiers: { press: 0.6, fatigue: 2.2, composure: 0.8, attack: 0.8 }
+    note: The press collapses.
+  - at: "65"
+    kind: modifiers
+    team: away
+    modifiers: { attack: 1.35, composure: 1.08, press: 1.2 }

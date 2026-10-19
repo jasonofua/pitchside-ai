@@ -31,6 +31,7 @@ from sim.formation import (
     target_position,
 )
 from sim.physics import PASS_DRAG, SHOT_DRAG, carry_speed_ms, flight_ms
+from sim.scenario import ScenarioDirector
 from sim.ulid import UlidFactory
 from sim.world import club as find_club
 
@@ -161,6 +162,7 @@ class MatchEngine:
         self._ulids = UlidFactory(self.match_id)
         self.home = self._make_team(find_club(world, config.home))
         self.away = self._make_team(find_club(world, config.away))
+        self.director = ScenarioDirector.for_name(config.scenario, config.home, config.away)
 
         self.seq = 0
         self.period: Literal[1, 2] = 1
@@ -198,7 +200,10 @@ class MatchEngine:
     def _play_period(self, period: Literal[1, 2], kicking: TeamState) -> Events:
         self.period = period
         start = 0 if period == 1 else HALF_MS
-        stoppage_s = self.rng.randint(60, 180) if period == 1 else self.rng.randint(180, 360)
+        lo, hi = (60, 180) if period == 1 else (180, 360)
+        if self.director is not None:
+            lo, hi = self.director.stoppage_range_s(period) or (lo, hi)
+        stoppage_s = self.rng.randint(lo, hi)
         end = start + HALF_MS + stoppage_s * 1000
         self.clock = start
         yield from self._kickoff(kicking)
@@ -309,7 +314,24 @@ class MatchEngine:
         self.restart = "kickoff"
         yield self._emit("kickoff", team, self.carrier, *CENTRE)
 
+    def _goal_due(self, team: TeamState) -> bool:
+        d = self.director
+        return d is not None and d.goal_due(team.id, self.period, self.clock)
+
+    def _red_card_due(self, team: TeamState) -> bool:
+        d = self.director
+        return d is not None and d.red_card_due(team.id, self.period, self.clock)
+
+    def _apply_script(self) -> None:
+        if self.director is None:
+            return
+        for beat in self.director.due_modifiers(self.period, self.clock):
+            team = self.home if beat.team_id == self.home.id else self.away
+            for name, value in beat.modifiers.items():
+                setattr(team.mods, name, value)
+
     def _step(self) -> Events:
+        self._apply_script()
         restart, self.restart = self.restart, None
         if restart not in (None, "keeper", "penalty"):
             yield from self._substitutions()
@@ -355,6 +377,8 @@ class MatchEngine:
             p_carry *= 0.3
         wide = y < 16 or y > 52
         r = self.rng.random()
+        if self._goal_due(self.team) and x > 70 and self.rng.random() < 0.3:
+            p_carry = max(p_carry, 0.35)  # run at the defence
         if r < p_shot:
             yield from self._shot()
         elif r < p_shot + p_carry:
@@ -366,10 +390,13 @@ class MatchEngine:
 
     def _shot_probability(self, x: float, y: float) -> float:
         dist = math.hypot(PITCH_LENGTH - x, CENTRE[1] - y)
+        due = self._goal_due(self.team)
         if in_box(x, y):
             p = 0.27 * math.exp(-(dist - 6) / 8)
+            if due:
+                p = max(3 * p, 0.35)
         elif dist < 30:
-            p = 0.065
+            p = 0.25 if due else 0.065
         else:
             return 0.0
         return min(0.9, p * self.team.mods.attack)
@@ -382,6 +409,11 @@ class MatchEngine:
         p_press = 0.30 * (opp.press_rating() / 0.72) * (0.6 + 0.4 * energy) * opp.mods.press
         if self.bx > 70:
             p_press *= 1.25
+        attack_due, red_due = self._goal_due(self.team), self._red_card_due(opp)
+        if attack_due:
+            p_press *= 0.5
+        if red_due:
+            p_press = max(p_press, 0.6)
         if self.rng.random() >= p_press:
             self.pressured = False
             return False
@@ -391,11 +423,12 @@ class MatchEngine:
         yield self._emit("pressure", opp, presser, fx, fy)
         box_factor = 0.35 if in_box(self.bx, self.by) else 1.0
 
-        if self.rng.random() < 0.04 * box_factor:
+        p_foul = 0.5 if red_due and not in_box(self.bx, self.by) else 0.04 * box_factor
+        if self.rng.random() < p_foul:
             self._wait(200, 600)
             yield from self._foul(opp, presser)
             return True
-        if self.rng.random() >= 0.13 * opp.mods.press:
+        if self.rng.random() >= 0.13 * opp.mods.press * (0.5 if attack_due else 1.0):
             return False
 
         self._wait(200, 600)
@@ -421,7 +454,11 @@ class MatchEngine:
         if fouler.yellow:
             p_yellow *= 0.4  # booked players hold back
         card: str | None = None
-        if r < 0.006:
+        if self._red_card_due(fouling):
+            assert self.director is not None
+            self.director.red_card_given(fouling.id)
+            card = "red"
+        elif r < 0.006:
             card = "red"
         elif r < 0.006 + p_yellow:
             card = "second_yellow" if fouler.yellow else "yellow"
@@ -530,6 +567,7 @@ class MatchEngine:
             player = self.rng.choices([m[0] for m in mates], weights=weights)[0]
             return player, self.rng.uniform(91, 100), self.rng.uniform(26, 42)
 
+        urgent = self._goal_due(self.team)
         long_ball = (restart == "goal_kick" and self.rng.random() < 0.5) or (
             self.carrier.slot.role in ("GK", "CB") and self.rng.random() < 0.12
         )
@@ -548,7 +586,7 @@ class MatchEngine:
                 w = 1.0 if p.slot.role in ("CM", "DM", "AM") else 0.05
             else:
                 w = math.exp(-(((d - 16) / 13) ** 2))
-                w *= 1 + 0.045 * max(dx, 0.0)
+                w *= 1 + (0.12 if urgent else 0.045) * max(dx, 0.0)
                 if dx < -8:
                     w *= 0.55
             if p.slot.role == "GK":
@@ -583,6 +621,8 @@ class MatchEngine:
             p += 0.004 * (attrs.passing - 72)
             if restart is not None:
                 p += 0.05
+            if self._goal_due(team):
+                p += 0.08
         p -= 0.12 * (1 - self._energy(team, passer))
         p = clamp(p * team.mods.composure, 0.12, 0.98)
         flight = flight_ms(dist, speed, PASS_DRAG)
@@ -716,11 +756,17 @@ class MatchEngine:
             speed = clamp(68 + 1.0 * dist + self.rng.gauss(0, 10), 40, 130)
 
         r = self.rng.random()
+        director = self.director
+        if director is not None:
+            if director.shot_must_score(team.id, self.period, self.clock):
+                r = 0.0
+            elif r < p_goal and not director.goal_allowed(team.id, self.period, self.clock):
+                r = 1.0  # the script says no: the keeper saves it
         if r < p_goal:
             outcome = "complete"
             end = (PITCH_LENGTH, CENTRE[1] + self.rng.uniform(-3.4, 3.4))
         else:
-            q = self.rng.random()
+            q = self.rng.random() if r < 1.0 else 0.5  # scripted denials are saves
             if q < 0.28 and not (penalty or free_kick):
                 outcome = "blocked"
                 step = self.rng.uniform(1.0, 4.0) / max(dist, 1.0)
@@ -746,6 +792,8 @@ class MatchEngine:
         if outcome == "complete":
             yield self._emit("goal", team, shooter, x, y, end=end, body_part=body)
             team.score += 1
+            if director is not None:
+                director.goal_scored(team.id, self.period, self.clock)
             self._wait(45_000, 75_000)
             yield from self._kickoff(opp)
         elif outcome == "saved":

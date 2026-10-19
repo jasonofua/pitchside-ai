@@ -1,0 +1,38 @@
+# A tight match, settled at 90+2'.
+name: late_winner
+description: >-
+  Kestrel Vale Athletic and Northbank Rovers trade goals in a tight, cagey match; Kestrel
+  Vale win it 2-1 at 90+2'.
+home: KVA
+away: NBR
+favourite: away
+scoring: scripted
+stoppage_s:
+  p2: [240, 330]
+beats:
+  - at: "0"
+    kind: modifiers
+    team: home
+    modifiers: { attack: 0.8, composure: 1.05 }
+    note: Cagey from the start.
+  - at: "0"
+    kind: modifiers
+    team: away
+    modifiers: { attack: 0.8, composure: 1.05 }
+  - at: "29"
+    kind: goal
+    team: away
+    note: Northbank go ahead.
+  - at: "63"
+    kind: goal
+    team: home
+    note: Kestrel Vale level.
+  - at: "85"
+    kind: modifiers
+    team: home
+    modifiers: { attack: 1.4, press: 1.3 }
+    note: Kestrel Vale chase the winner.
+  - at: "90+2"
+    kind: goal
+    team: home
+    note: The late winner.

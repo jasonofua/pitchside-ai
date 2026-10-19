@@ -1,0 +1,42 @@
+# The underdog trails 0-2 at the hour, then scores at 71' and 88'.
+name: comeback
+description: >-
+  Lagos Lions, the underdogs at home, fall 0-2 behind Harbour City FC by the hour, push
+  everyone forward and score at 71' and 88' to draw 2-2.
+home: LAG
+away: HCF
+favourite: away
+scoring: scripted
+stoppage_s:
+  p2: [200, 280]
+beats:
+  - at: "17"
+    kind: goal
+    team: favourite
+    note: Harbour City take an early lead.
+  - at: "52"
+    kind: goal
+    team: favourite
+    note: 0-2 just after the break.
+  - at: "53"
+    kind: modifiers
+    team: favourite
+    modifiers: { composure: 1.05, press: 0.9 }
+    note: Two up, Harbour City sit off.
+  - at: "60"
+    kind: modifiers
+    team: underdog
+    modifiers: { attack: 1.4, press: 1.3, composure: 1.05, fatigue: 1.3 }
+    note: The Lions throw bodies forward and press high.
+  - at: "60"
+    kind: modifiers
+    team: favourite
+    modifiers: { composure: 0.9 }
+  - at: "71"
+    kind: goal
+    team: underdog
+    note: 1-2.
+  - at: "88"
+    kind: goal
+    team: underdog
+    note: 2-2.

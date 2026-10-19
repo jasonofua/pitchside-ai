@@ -1,0 +1,32 @@
+# A straight red at 34', momentum collapse, then recovery.
+name: red_card
+description: >-
+  Northbank Rovers lose a player to a straight red card at 34' and are pinned back for
+  twenty minutes, then reorganise and fight back after the hour.
+home: HCF
+away: NBR
+favourite: home
+scoring: free
+beats:
+  - at: "34"
+    kind: red_card
+    team: away
+    note: Straight red.
+  - at: "35"
+    kind: modifiers
+    team: away
+    modifiers: { composure: 0.82, press: 0.75, attack: 0.6 }
+    note: Ten men, chaos.
+  - at: "35"
+    kind: modifiers
+    team: home
+    modifiers: { attack: 1.3, composure: 1.05 }
+  - at: "60"
+    kind: modifiers
+    team: away
+    modifiers: { composure: 1.02, press: 1.15, attack: 1.1 }
+    note: Reorganised into a compact 4-4-1; the recovery begins.
+  - at: "60"
+    kind: modifiers
+    team: home
+    modifiers: { attack: 1.0, composure: 0.95 }

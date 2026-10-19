@@ -10,12 +10,11 @@ from pathlib import Path
 from sim import __version__
 from sim.engine import MatchConfig
 from sim.runner import run_match
+from sim.scenario import load_scenario, scenario_names
 from sim.sinks import TOPICS, FileSink, JsonlSink, PrettySink, Sink, Topic
 from sim.world import REPO_ROOT, load_world
 
-# Scripted scenarios (comeback, red_card, pressing_collapse, late_winner) arrive with
-# sim/scenarios/*.yaml; until then only the unscripted baseline exists.
-SCENARIOS = ("default",)
+DEFAULT_HOME, DEFAULT_AWAY = "LAG", "HCF"
 PLANNED_SINKS = {
     "ws": "the WebSocket sink arrives with the gateway (build plan Day 3)",
     "eventhubs": "the Event Hubs sink arrives with the Azure deployment (build plan Day 7)",
@@ -30,7 +29,11 @@ def build_parser() -> argparse.ArgumentParser:
     commands = parser.add_subparsers(dest="command", required=True)
 
     run = commands.add_parser("run", help="simulate a match and stream it to a sink")
-    run.add_argument("--scenario", default="default", help="scripted story beats (default: none)")
+    run.add_argument(
+        "--scenario",
+        default="default",
+        help=f"scripted story beats: {', '.join(scenario_names())} (default: none)",
+    )
     run.add_argument("--seed", type=int, default=42)
     run.add_argument(
         "--speed",
@@ -43,8 +46,10 @@ def build_parser() -> argparse.ArgumentParser:
         "--format", choices=["jsonl", "pretty"], default="jsonl", help="stdout sink only"
     )
     run.add_argument("--topics", default="events,tracking", help="comma-separated: events,tracking")
-    run.add_argument("--home", default="LAG", help="home team_id (see `python -m sim teams`)")
-    run.add_argument("--away", default="HCF", help="away team_id")
+    run.add_argument(
+        "--home", help="home team_id (see `python -m sim teams`); default: the scenario's, or LAG"
+    )
+    run.add_argument("--away", help="away team_id; default: the scenario's, or HCF")
     run.add_argument(
         "--match-id", help="override the derived match id (use a fresh one per live run)"
     )
@@ -80,8 +85,16 @@ def _cmd_teams(args: argparse.Namespace) -> int:
 def _cmd_run(parser: argparse.ArgumentParser, args: argparse.Namespace) -> int:
     if args.sink in PLANNED_SINKS:
         parser.error(f"--sink {args.sink} is not implemented yet: {PLANNED_SINKS[args.sink]}")
-    if args.scenario not in SCENARIOS:
-        parser.error(f"unknown scenario {args.scenario!r}; available: {', '.join(SCENARIOS)}")
+    if args.scenario not in scenario_names():
+        parser.error(
+            f"unknown scenario {args.scenario!r}; available: {', '.join(scenario_names())}"
+        )
+    if args.scenario != "default":
+        scenario = load_scenario(args.scenario)
+        args.home = args.home or scenario.home
+        args.away = args.away or scenario.away
+    args.home = args.home or DEFAULT_HOME
+    args.away = args.away or DEFAULT_AWAY
     if args.speed < 0:
         parser.error("--speed must be >= 0")
     topics = _parse_topics(parser, args.topics)

@@ -31,16 +31,19 @@ class Pacer:
         self._anchor_clock = 0
         self._anchor_wall = 0.0
 
-    def wait(self, period: int, clock_ms: int) -> None:
+    def delay(self, period: int, clock_ms: int) -> float:
+        """Seconds to wait before releasing an item at (period, clock_ms); never negative."""
         if self.speed == 0:
-            return
+            return 0.0
         if period != self._period:
-            if self._period is not None and self.halftime_s > 0:
-                self._sleep(self.halftime_s)
+            pause = self.halftime_s if self._period is not None else 0.0
             self._period = period
             self._anchor_clock = clock_ms
-            self._anchor_wall = self._now()
+            self._anchor_wall = self._now() + max(pause, 0.0)
         due = self._anchor_wall + (clock_ms - self._anchor_clock) / 1000 / self.speed
-        delay = due - self._now()
-        if delay > 0:
-            self._sleep(delay)
+        return max(0.0, due - self._now())
+
+    def wait(self, period: int, clock_ms: int) -> None:
+        seconds = self.delay(period, clock_ms)
+        if seconds > 0:
+            self._sleep(seconds)
