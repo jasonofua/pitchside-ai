@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 140" role="img" aria-label="Kestrel Vale Athletic crest">
+  <clipPath id="c"><path d="M60 4 L116 70 L60 136 L4 70 Z"/></clipPath>
+  <path d="M60 4 L116 70 L60 136 L4 70 Z" fill="#5B3FA0" stroke="#FFD23F" stroke-width="4"/>
+  <g clip-path="url(#c)" opacity="0.9"><circle cx="60" cy="56" r="26" fill="none" stroke="#FFD23F" stroke-width="9"/></g>
+  <text x="60" y="106" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#FFD23F">KVA</text>
+</svg>

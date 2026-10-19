@@ -1,0 +1,1133 @@
+{
+  "version": 1,
+  "clubs": [
+    {
+      "team_id": "LAG",
+      "name": "Lagos Lions",
+      "short_name": "Lions",
+      "city": "Lagos",
+      "colors": {
+        "primary": "#F2B705",
+        "secondary": "#14213D"
+      },
+      "crest": {
+        "shape": "shield",
+        "motif": "star"
+      },
+      "formation": "4-3-3",
+      "starting_xi": [
+        "LAG-01",
+        "LAG-02",
+        "LAG-05",
+        "LAG-04",
+        "LAG-03",
+        "LAG-06",
+        "LAG-08",
+        "LAG-10",
+        "LAG-07",
+        "LAG-09",
+        "LAG-11"
+      ],
+      "players": [
+        {
+          "player_id": "LAG-01",
+          "name": "Babajide Oyerinde",
+          "short_name": "Oyerinde",
+          "shirt_number": 1,
+          "position": "GK",
+          "attributes": {
+            "pace": 57,
+            "passing": 53,
+            "finishing": 30,
+            "pressing": 30,
+            "stamina": 72
+          }
+        },
+        {
+          "player_id": "LAG-02",
+          "name": "Tobi Akinwale",
+          "short_name": "Akinwale",
+          "shirt_number": 2,
+          "position": "RB",
+          "attributes": {
+            "pace": 83,
+            "passing": 66,
+            "finishing": 46,
+            "pressing": 72,
+            "stamina": 84
+          }
+        },
+        {
+          "player_id": "LAG-05",
+          "name": "Chukwuemeka Nwadike",
+          "short_name": "Nwadike",
+          "shirt_number": 5,
+          "position": "CB",
+          "attributes": {
+            "pace": 66,
+            "passing": 67,
+            "finishing": 37,
+            "pressing": 78,
+            "stamina": 73
+          }
+        },
+        {
+          "player_id": "LAG-04",
+          "name": "Segun Adewuyi",
+          "short_name": "Adewuyi",
+          "shirt_number": 4,
+          "position": "CB",
+          "attributes": {
+            "pace": 68,
+            "passing": 72,
+            "finishing": 47,
+            "pressing": 71,
+            "stamina": 69
+          }
+        },
+        {
+          "player_id": "LAG-03",
+          "name": "Kelechi Amadike",
+          "short_name": "Amadike",
+          "shirt_number": 3,
+          "position": "LB",
+          "attributes": {
+            "pace": 65,
+            "passing": 78,
+            "finishing": 49,
+            "pressing": 72,
+            "stamina": 77
+          }
+        },
+        {
+          "player_id": "LAG-06",
+          "name": "Musa Danladi",
+          "short_name": "Danladi",
+          "shirt_number": 6,
+          "position": "DM",
+          "attributes": {
+            "pace": 55,
+            "passing": 73,
+            "finishing": 36,
+            "pressing": 80,
+            "stamina": 73
+          }
+        },
+        {
+          "player_id": "LAG-08",
+          "name": "Femi Olorunfemi",
+          "short_name": "Olorunfemi",
+          "shirt_number": 8,
+          "position": "CM",
+          "attributes": {
+            "pace": 74,
+            "passing": 82,
+            "finishing": 78,
+            "pressing": 78,
+            "stamina": 84
+          }
+        },
+        {
+          "player_id": "LAG-10",
+          "name": "Ayodele Bankole",
+          "short_name": "Bankole",
+          "shirt_number": 10,
+          "position": "CM",
+          "attributes": {
+            "pace": 69,
+            "passing": 81,
+            "finishing": 60,
+            "pressing": 62,
+            "stamina": 76
+          }
+        },
+        {
+          "player_id": "LAG-07",
+          "name": "Ikenna Obiora",
+          "short_name": "Obiora",
+          "shirt_number": 7,
+          "position": "RW",
+          "attributes": {
+            "pace": 86,
+            "passing": 73,
+            "finishing": 72,
+            "pressing": 67,
+            "stamina": 81
+          }
+        },
+        {
+          "player_id": "LAG-09",
+          "name": "Dapo Okunade",
+          "short_name": "Okunade",
+          "shirt_number": 9,
+          "position": "ST",
+          "attributes": {
+            "pace": 90,
+            "passing": 67,
+            "finishing": 88,
+            "pressing": 58,
+            "stamina": 77
+          }
+        },
+        {
+          "player_id": "LAG-11",
+          "name": "Chidi Ezeugo",
+          "short_name": "Ezeugo",
+          "shirt_number": 11,
+          "position": "LW",
+          "attributes": {
+            "pace": 78,
+            "passing": 72,
+            "finishing": 67,
+            "pressing": 61,
+            "stamina": 77
+          }
+        },
+        {
+          "player_id": "LAG-16",
+          "name": "Uchenna Agbaje",
+          "short_name": "Agbaje",
+          "shirt_number": 16,
+          "position": "GK",
+          "attributes": {
+            "pace": 63,
+            "passing": 60,
+            "finishing": 30,
+            "pressing": 30,
+            "stamina": 65
+          }
+        },
+        {
+          "player_id": "LAG-15",
+          "name": "Ibrahim Kolawole",
+          "short_name": "Kolawole",
+          "shirt_number": 15,
+          "position": "CB",
+          "attributes": {
+            "pace": 63,
+            "passing": 66,
+            "finishing": 40,
+            "pressing": 66,
+            "stamina": 81
+          }
+        },
+        {
+          "player_id": "LAG-12",
+          "name": "Sola Fagbemi",
+          "short_name": "Fagbemi",
+          "shirt_number": 12,
+          "position": "RB",
+          "attributes": {
+            "pace": 82,
+            "passing": 66,
+            "finishing": 40,
+            "pressing": 75,
+            "stamina": 79
+          }
+        },
+        {
+          "player_id": "LAG-14",
+          "name": "Yakubu Bitrus",
+          "short_name": "Bitrus",
+          "shirt_number": 14,
+          "position": "DM",
+          "attributes": {
+            "pace": 73,
+            "passing": 82,
+            "finishing": 55,
+            "pressing": 71,
+            "stamina": 73
+          }
+        },
+        {
+          "player_id": "LAG-18",
+          "name": "Damilare Ojediran",
+          "short_name": "Ojediran",
+          "shirt_number": 18,
+          "position": "AM",
+          "attributes": {
+            "pace": 75,
+            "passing": 77,
+            "finishing": 71,
+            "pressing": 74,
+            "stamina": 74
+          }
+        },
+        {
+          "player_id": "LAG-17",
+          "name": "Obinna Ukaegbu",
+          "short_name": "Ukaegbu",
+          "shirt_number": 17,
+          "position": "RW",
+          "attributes": {
+            "pace": 83,
+            "passing": 68,
+            "finishing": 65,
+            "pressing": 58,
+            "stamina": 72
+          }
+        },
+        {
+          "player_id": "LAG-19",
+          "name": "Kunle Arogundade",
+          "short_name": "Arogundade",
+          "shirt_number": 19,
+          "position": "ST",
+          "attributes": {
+            "pace": 79,
+            "passing": 62,
+            "finishing": 81,
+            "pressing": 60,
+            "stamina": 70
+          }
+        }
+      ]
+    },
+    {
+      "team_id": "HCF",
+      "name": "Harbour City FC",
+      "short_name": "Harbour",
+      "city": "Harbour City",
+      "colors": {
+        "primary": "#0E7C86",
+        "secondary": "#F4F1DE"
+      },
+      "crest": {
+        "shape": "circle",
+        "motif": "wave"
+      },
+      "formation": "4-2-3-1",
+      "starting_xi": [
+        "HCF-01",
+        "HCF-02",
+        "HCF-04",
+        "HCF-05",
+        "HCF-03",
+        "HCF-06",
+        "HCF-08",
+        "HCF-07",
+        "HCF-10",
+        "HCF-11",
+        "HCF-09"
+      ],
+      "players": [
+        {
+          "player_id": "HCF-01",
+          "name": "Mateus Arruda",
+          "short_name": "Arruda",
+          "shirt_number": 1,
+          "position": "GK",
+          "attributes": {
+            "pace": 57,
+            "passing": 56,
+            "finishing": 30,
+            "pressing": 33,
+            "stamina": 59
+          }
+        },
+        {
+          "player_id": "HCF-02",
+          "name": "Kofi Adomako",
+          "short_name": "Adomako",
+          "shirt_number": 2,
+          "position": "RB",
+          "attributes": {
+            "pace": 78,
+            "passing": 69,
+            "finishing": 46,
+            "pressing": 82,
+            "stamina": 75
+          }
+        },
+        {
+          "player_id": "HCF-04",
+          "name": "Lucien Marchetti",
+          "short_name": "Marchetti",
+          "shirt_number": 4,
+          "position": "CB",
+          "attributes": {
+            "pace": 63,
+            "passing": 62,
+            "finishing": 30,
+            "pressing": 72,
+            "stamina": 67
+          }
+        },
+        {
+          "player_id": "HCF-05",
+          "name": "Ebo Mensah-Arthur",
+          "short_name": "Mensah-Arthur",
+          "shirt_number": 5,
+          "position": "CB",
+          "attributes": {
+            "pace": 73,
+            "passing": 65,
+            "finishing": 38,
+            "pressing": 68,
+            "stamina": 74
+          }
+        },
+        {
+          "player_id": "HCF-03",
+          "name": "Rafael Duarte-Lima",
+          "short_name": "Duarte-Lima",
+          "shirt_number": 3,
+          "position": "LB",
+          "attributes": {
+            "pace": 70,
+            "passing": 70,
+            "finishing": 49,
+            "pressing": 68,
+            "stamina": 89
+          }
+        },
+        {
+          "player_id": "HCF-06",
+          "name": "Yaw Sarpong-Kyei",
+          "short_name": "Sarpong-Kyei",
+          "shirt_number": 6,
+          "position": "DM",
+          "attributes": {
+            "pace": 69,
+            "passing": 79,
+            "finishing": 53,
+            "pressing": 80,
+            "stamina": 78
+          }
+        },
+        {
+          "player_id": "HCF-08",
+          "name": "Davi Vasconcelos",
+          "short_name": "Vasconcelos",
+          "shirt_number": 8,
+          "position": "DM",
+          "attributes": {
+            "pace": 64,
+            "passing": 76,
+            "finishing": 50,
+            "pressing": 71,
+            "stamina": 81
+          }
+        },
+        {
+          "player_id": "HCF-07",
+          "name": "Jamal Kingsley-Ward",
+          "short_name": "Kingsley-Ward",
+          "shirt_number": 7,
+          "position": "RW",
+          "attributes": {
+            "pace": 84,
+            "passing": 62,
+            "finishing": 67,
+            "pressing": 72,
+            "stamina": 84
+          }
+        },
+        {
+          "player_id": "HCF-10",
+          "name": "Nuno Seabra",
+          "short_name": "Seabra",
+          "shirt_number": 10,
+          "position": "AM",
+          "attributes": {
+            "pace": 70,
+            "passing": 89,
+            "finishing": 66,
+            "pressing": 58,
+            "stamina": 75
+          }
+        },
+        {
+          "player_id": "HCF-11",
+          "name": "Kojo Amissah",
+          "short_name": "Amissah",
+          "shirt_number": 11,
+          "position": "LW",
+          "attributes": {
+            "pace": 86,
+            "passing": 75,
+            "finishing": 77,
+            "pressing": 63,
+            "stamina": 78
+          }
+        },
+        {
+          "player_id": "HCF-09",
+          "name": "Emmanuel Darko-Fynn",
+          "short_name": "Darko-Fynn",
+          "shirt_number": 9,
+          "position": "ST",
+          "attributes": {
+            "pace": 72,
+            "passing": 68,
+            "finishing": 78,
+            "pressing": 69,
+            "stamina": 63
+          }
+        },
+        {
+          "player_id": "HCF-13",
+          "name": "Silas Okyere",
+          "short_name": "Okyere",
+          "shirt_number": 13,
+          "position": "GK",
+          "attributes": {
+            "pace": 62,
+            "passing": 64,
+            "finishing": 30,
+            "pressing": 37,
+            "stamina": 62
+          }
+        },
+        {
+          "player_id": "HCF-15",
+          "name": "Bastien Leclair",
+          "short_name": "Leclair",
+          "shirt_number": 15,
+          "position": "CB",
+          "attributes": {
+            "pace": 68,
+            "passing": 68,
+            "finishing": 30,
+            "pressing": 71,
+            "stamina": 83
+          }
+        },
+        {
+          "player_id": "HCF-23",
+          "name": "Marlon Pryce",
+          "short_name": "Pryce",
+          "shirt_number": 23,
+          "position": "LB",
+          "attributes": {
+            "pace": 81,
+            "passing": 70,
+            "finishing": 50,
+            "pressing": 67,
+            "stamina": 79
+          }
+        },
+        {
+          "player_id": "HCF-18",
+          "name": "Fiifi Ankrah",
+          "short_name": "Ankrah",
+          "shirt_number": 18,
+          "position": "DM",
+          "attributes": {
+            "pace": 66,
+            "passing": 73,
+            "finishing": 60,
+            "pressing": 85,
+            "stamina": 83
+          }
+        },
+        {
+          "player_id": "HCF-20",
+          "name": "Tiago Moura",
+          "short_name": "Moura",
+          "shirt_number": 20,
+          "position": "AM",
+          "attributes": {
+            "pace": 73,
+            "passing": 96,
+            "finishing": 65,
+            "pressing": 68,
+            "stamina": 78
+          }
+        },
+        {
+          "player_id": "HCF-17",
+          "name": "Desmond Ashby",
+          "short_name": "Ashby",
+          "shirt_number": 17,
+          "position": "LW",
+          "attributes": {
+            "pace": 90,
+            "passing": 66,
+            "finishing": 67,
+            "pressing": 59,
+            "stamina": 75
+          }
+        },
+        {
+          "player_id": "HCF-19",
+          "name": "Ruben Calado",
+          "short_name": "Calado",
+          "shirt_number": 19,
+          "position": "ST",
+          "attributes": {
+            "pace": 75,
+            "passing": 64,
+            "finishing": 70,
+            "pressing": 64,
+            "stamina": 77
+          }
+        }
+      ]
+    },
+    {
+      "team_id": "NBR",
+      "name": "Northbank Rovers",
+      "short_name": "Rovers",
+      "city": "Northbank",
+      "colors": {
+        "primary": "#B3261E",
+        "secondary": "#FFFFFF"
+      },
+      "crest": {
+        "shape": "hexagon",
+        "motif": "chevron"
+      },
+      "formation": "4-4-2",
+      "starting_xi": [
+        "NBR-01",
+        "NBR-02",
+        "NBR-05",
+        "NBR-06",
+        "NBR-03",
+        "NBR-07",
+        "NBR-08",
+        "NBR-04",
+        "NBR-11",
+        "NBR-09",
+        "NBR-10"
+      ],
+      "players": [
+        {
+          "player_id": "NBR-01",
+          "name": "Callum Hartigan",
+          "short_name": "Hartigan",
+          "shirt_number": 1,
+          "position": "GK",
+          "attributes": {
+            "pace": 56,
+            "passing": 61,
+            "finishing": 30,
+            "pressing": 38,
+            "stamina": 54
+          }
+        },
+        {
+          "player_id": "NBR-02",
+          "name": "Owen Pritchard",
+          "short_name": "Pritchard",
+          "shirt_number": 2,
+          "position": "RB",
+          "attributes": {
+            "pace": 63,
+            "passing": 67,
+            "finishing": 36,
+            "pressing": 83,
+            "stamina": 74
+          }
+        },
+        {
+          "player_id": "NBR-05",
+          "name": "Declan Furlong",
+          "short_name": "Furlong",
+          "shirt_number": 5,
+          "position": "CB",
+          "attributes": {
+            "pace": 63,
+            "passing": 63,
+            "finishing": 35,
+            "pressing": 69,
+            "stamina": 63
+          }
+        },
+        {
+          "player_id": "NBR-06",
+          "name": "Magnus Halvorsen",
+          "short_name": "Halvorsen",
+          "shirt_number": 6,
+          "position": "CB",
+          "attributes": {
+            "pace": 70,
+            "passing": 62,
+            "finishing": 40,
+            "pressing": 79,
+            "stamina": 68
+          }
+        },
+        {
+          "player_id": "NBR-03",
+          "name": "Rhys Penhallow",
+          "short_name": "Penhallow",
+          "shirt_number": 3,
+          "position": "LB",
+          "attributes": {
+            "pace": 68,
+            "passing": 62,
+            "finishing": 47,
+            "pressing": 80,
+            "stamina": 71
+          }
+        },
+        {
+          "player_id": "NBR-07",
+          "name": "Jonah Whitcombe",
+          "short_name": "Whitcombe",
+          "shirt_number": 7,
+          "position": "RM",
+          "attributes": {
+            "pace": 78,
+            "passing": 72,
+            "finishing": 53,
+            "pressing": 78,
+            "stamina": 72
+          }
+        },
+        {
+          "player_id": "NBR-08",
+          "name": "Finlay Gorrie",
+          "short_name": "Gorrie",
+          "shirt_number": 8,
+          "position": "CM",
+          "attributes": {
+            "pace": 69,
+            "passing": 78,
+            "finishing": 53,
+            "pressing": 74,
+            "stamina": 67
+          }
+        },
+        {
+          "player_id": "NBR-04",
+          "name": "Aksel Brennhaug",
+          "short_name": "Brennhaug",
+          "shirt_number": 4,
+          "position": "CM",
+          "attributes": {
+            "pace": 73,
+            "passing": 72,
+            "finishing": 66,
+            "pressing": 81,
+            "stamina": 79
+          }
+        },
+        {
+          "player_id": "NBR-11",
+          "name": "Theo Ashdown",
+          "short_name": "Ashdown",
+          "shirt_number": 11,
+          "position": "LM",
+          "attributes": {
+            "pace": 85,
+            "passing": 66,
+            "finishing": 57,
+            "pressing": 79,
+            "stamina": 64
+          }
+        },
+        {
+          "player_id": "NBR-09",
+          "name": "Ciaran Mulvey",
+          "short_name": "Mulvey",
+          "shirt_number": 9,
+          "position": "ST",
+          "attributes": {
+            "pace": 91,
+            "passing": 71,
+            "finishing": 75,
+            "pressing": 67,
+            "stamina": 62
+          }
+        },
+        {
+          "player_id": "NBR-10",
+          "name": "Ludo Marsh",
+          "short_name": "Marsh",
+          "shirt_number": 10,
+          "position": "ST",
+          "attributes": {
+            "pace": 74,
+            "passing": 60,
+            "finishing": 75,
+            "pressing": 66,
+            "stamina": 66
+          }
+        },
+        {
+          "player_id": "NBR-13",
+          "name": "Ellis Vane",
+          "short_name": "Vane",
+          "shirt_number": 13,
+          "position": "GK",
+          "attributes": {
+            "pace": 48,
+            "passing": 58,
+            "finishing": 30,
+            "pressing": 35,
+            "stamina": 53
+          }
+        },
+        {
+          "player_id": "NBR-15",
+          "name": "Gareth Lowther",
+          "short_name": "Lowther",
+          "shirt_number": 15,
+          "position": "CB",
+          "attributes": {
+            "pace": 64,
+            "passing": 53,
+            "finishing": 30,
+            "pressing": 83,
+            "stamina": 66
+          }
+        },
+        {
+          "player_id": "NBR-12",
+          "name": "Niall Cushnahan",
+          "short_name": "Cushnahan",
+          "shirt_number": 12,
+          "position": "RB",
+          "attributes": {
+            "pace": 73,
+            "passing": 63,
+            "finishing": 51,
+            "pressing": 81,
+            "stamina": 68
+          }
+        },
+        {
+          "player_id": "NBR-14",
+          "name": "Soren Lykke",
+          "short_name": "Lykke",
+          "shirt_number": 14,
+          "position": "CM",
+          "attributes": {
+            "pace": 63,
+            "passing": 79,
+            "finishing": 54,
+            "pressing": 79,
+            "stamina": 69
+          }
+        },
+        {
+          "player_id": "NBR-16",
+          "name": "Harvey Elstob",
+          "short_name": "Elstob",
+          "shirt_number": 16,
+          "position": "CM",
+          "attributes": {
+            "pace": 70,
+            "passing": 81,
+            "finishing": 59,
+            "pressing": 80,
+            "stamina": 72
+          }
+        },
+        {
+          "player_id": "NBR-17",
+          "name": "Bram Okoro-Hale",
+          "short_name": "Okoro-Hale",
+          "shirt_number": 17,
+          "position": "RM",
+          "attributes": {
+            "pace": 80,
+            "passing": 74,
+            "finishing": 73,
+            "pressing": 71,
+            "stamina": 73
+          }
+        },
+        {
+          "player_id": "NBR-18",
+          "name": "Tomas Wedderburn",
+          "short_name": "Wedderburn",
+          "shirt_number": 18,
+          "position": "ST",
+          "attributes": {
+            "pace": 80,
+            "passing": 63,
+            "finishing": 67,
+            "pressing": 67,
+            "stamina": 55
+          }
+        }
+      ]
+    },
+    {
+      "team_id": "KVA",
+      "name": "Kestrel Vale Athletic",
+      "short_name": "Kestrels",
+      "city": "Kestrel Vale",
+      "colors": {
+        "primary": "#5B3FA0",
+        "secondary": "#FFD23F"
+      },
+      "crest": {
+        "shape": "diamond",
+        "motif": "ring"
+      },
+      "formation": "3-5-2",
+      "starting_xi": [
+        "KVA-01",
+        "KVA-04",
+        "KVA-05",
+        "KVA-06",
+        "KVA-02",
+        "KVA-08",
+        "KVA-16",
+        "KVA-10",
+        "KVA-03",
+        "KVA-09",
+        "KVA-11"
+      ],
+      "players": [
+        {
+          "player_id": "KVA-01",
+          "name": "Iker Albeniz",
+          "short_name": "Albeniz",
+          "shirt_number": 1,
+          "position": "GK",
+          "attributes": {
+            "pace": 59,
+            "passing": 62,
+            "finishing": 30,
+            "pressing": 30,
+            "stamina": 59
+          }
+        },
+        {
+          "player_id": "KVA-04",
+          "name": "Gaspard Morel",
+          "short_name": "Morel",
+          "shirt_number": 4,
+          "position": "CB",
+          "attributes": {
+            "pace": 69,
+            "passing": 61,
+            "finishing": 33,
+            "pressing": 62,
+            "stamina": 70
+          }
+        },
+        {
+          "player_id": "KVA-05",
+          "name": "Alejandro Iturbe",
+          "short_name": "Iturbe",
+          "shirt_number": 5,
+          "position": "CB",
+          "attributes": {
+            "pace": 67,
+            "passing": 68,
+            "finishing": 36,
+            "pressing": 64,
+            "stamina": 66
+          }
+        },
+        {
+          "player_id": "KVA-06",
+          "name": "Samuel Ndongala",
+          "short_name": "Ndongala",
+          "shirt_number": 6,
+          "position": "CB",
+          "attributes": {
+            "pace": 71,
+            "passing": 61,
+            "finishing": 34,
+            "pressing": 66,
+            "stamina": 69
+          }
+        },
+        {
+          "player_id": "KVA-02",
+          "name": "Lucas Ferrandis",
+          "short_name": "Ferrandis",
+          "shirt_number": 2,
+          "position": "RWB",
+          "attributes": {
+            "pace": 91,
+            "passing": 71,
+            "finishing": 52,
+            "pressing": 74,
+            "stamina": 80
+          }
+        },
+        {
+          "player_id": "KVA-08",
+          "name": "Mateo Larrain",
+          "short_name": "Larrain",
+          "shirt_number": 8,
+          "position": "CM",
+          "attributes": {
+            "pace": 67,
+            "passing": 75,
+            "finishing": 52,
+            "pressing": 69,
+            "stamina": 81
+          }
+        },
+        {
+          "player_id": "KVA-16",
+          "name": "Hugo Valcarce",
+          "short_name": "Valcarce",
+          "shirt_number": 16,
+          "position": "DM",
+          "attributes": {
+            "pace": 61,
+            "passing": 65,
+            "finishing": 54,
+            "pressing": 67,
+            "stamina": 75
+          }
+        },
+        {
+          "player_id": "KVA-10",
+          "name": "Andres Quiroga",
+          "short_name": "Quiroga",
+          "shirt_number": 10,
+          "position": "CM",
+          "attributes": {
+            "pace": 67,
+            "passing": 76,
+            "finishing": 53,
+            "pressing": 70,
+            "stamina": 85
+          }
+        },
+        {
+          "player_id": "KVA-03",
+          "name": "Noe Balandier",
+          "short_name": "Balandier",
+          "shirt_number": 3,
+          "position": "LWB",
+          "attributes": {
+            "pace": 80,
+            "passing": 67,
+            "finishing": 43,
+            "pressing": 64,
+            "stamina": 79
+          }
+        },
+        {
+          "player_id": "KVA-09",
+          "name": "Bruno Ascarate",
+          "short_name": "Ascarate",
+          "shirt_number": 9,
+          "position": "ST",
+          "attributes": {
+            "pace": 77,
+            "passing": 61,
+            "finishing": 85,
+            "pressing": 55,
+            "stamina": 66
+          }
+        },
+        {
+          "player_id": "KVA-11",
+          "name": "Yannick Sorel",
+          "short_name": "Sorel",
+          "shirt_number": 11,
+          "position": "ST",
+          "attributes": {
+            "pace": 83,
+            "passing": 66,
+            "finishing": 80,
+            "pressing": 60,
+            "stamina": 71
+          }
+        },
+        {
+          "player_id": "KVA-13",
+          "name": "Pau Ribelles",
+          "short_name": "Ribelles",
+          "shirt_number": 13,
+          "position": "GK",
+          "attributes": {
+            "pace": 49,
+            "passing": 67,
+            "finishing": 30,
+            "pressing": 30,
+            "stamina": 59
+          }
+        },
+        {
+          "player_id": "KVA-15",
+          "name": "Elias Corbalan",
+          "short_name": "Corbalan",
+          "shirt_number": 15,
+          "position": "CB",
+          "attributes": {
+            "pace": 63,
+            "passing": 70,
+            "finishing": 31,
+            "pressing": 74,
+            "stamina": 73
+          }
+        },
+        {
+          "player_id": "KVA-12",
+          "name": "Malo Treguier",
+          "short_name": "Treguier",
+          "shirt_number": 12,
+          "position": "LWB",
+          "attributes": {
+            "pace": 75,
+            "passing": 64,
+            "finishing": 54,
+            "pressing": 70,
+            "stamina": 80
+          }
+        },
+        {
+          "player_id": "KVA-14",
+          "name": "Diego Altuna",
+          "short_name": "Altuna",
+          "shirt_number": 14,
+          "position": "CM",
+          "attributes": {
+            "pace": 61,
+            "passing": 70,
+            "finishing": 53,
+            "pressing": 74,
+            "stamina": 87
+          }
+        },
+        {
+          "player_id": "KVA-20",
+          "name": "Rayan Benhaddou",
+          "short_name": "Benhaddou",
+          "shirt_number": 20,
+          "position": "AM",
+          "attributes": {
+            "pace": 74,
+            "passing": 82,
+            "finishing": 70,
+            "pressing": 58,
+            "stamina": 71
+          }
+        },
+        {
+          "player_id": "KVA-07",
+          "name": "Joaquin Esparza",
+          "short_name": "Esparza",
+          "shirt_number": 7,
+          "position": "RM",
+          "attributes": {
+            "pace": 90,
+            "passing": 66,
+            "finishing": 65,
+            "pressing": 65,
+            "stamina": 73
+          }
+        },
+        {
+          "player_id": "KVA-19",
+          "name": "Leo Castellvi",
+          "short_name": "Castellvi",
+          "shirt_number": 19,
+          "position": "ST",
+          "attributes": {
+            "pace": 66,
+            "passing": 64,
+            "finishing": 80,
+            "pressing": 71,
+            "stamina": 64
+          }
+        }
+      ]
+    }
+  ]
+}

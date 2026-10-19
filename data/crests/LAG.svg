@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 140" role="img" aria-label="Lagos Lions crest">
+  <clipPath id="c"><path d="M10 8 H110 V70 C110 105 85 125 60 136 C35 125 10 105 10 70 Z"/></clipPath>
+  <path d="M10 8 H110 V70 C110 105 85 125 60 136 C35 125 10 105 10 70 Z" fill="#F2B705" stroke="#14213D" stroke-width="4"/>
+  <g clip-path="url(#c)" opacity="0.9"><path d="M60 22 L69 48 L97 48 L75 64 L83 91 L60 75 L37 91 L45 64 L23 48 L51 48 Z" fill="#14213D"/></g>
+  <text x="60" y="118" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#14213D">LAG</text>
+</svg>

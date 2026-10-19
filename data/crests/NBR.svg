@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 140" role="img" aria-label="Northbank Rovers crest">
+  <clipPath id="c"><path d="M60 6 L114 37 V103 L60 134 L6 103 V37 Z"/></clipPath>
+  <path d="M60 6 L114 37 V103 L60 134 L6 103 V37 Z" fill="#B3261E" stroke="#FFFFFF" stroke-width="4"/>
+  <g clip-path="url(#c)" opacity="0.9"><path d="M0 30 L60 65 L120 30 V52 L60 87 L0 52 Z" fill="#FFFFFF"/></g>
+  <text x="60" y="112" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#FFFFFF">NBR</text>
+</svg>

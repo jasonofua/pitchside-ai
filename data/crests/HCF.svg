@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 140" role="img" aria-label="Harbour City FC crest">
+  <clipPath id="c"><path d="M60 8 A64 64 0 1 1 59.9 8 Z"/></clipPath>
+  <path d="M60 8 A64 64 0 1 1 59.9 8 Z" fill="#0E7C86" stroke="#F4F1DE" stroke-width="4"/>
+  <g clip-path="url(#c)" opacity="0.9"><path d="M0 78 Q30 58 60 78 T120 78 V100 Q90 80 60 100 T0 100 Z" fill="#F4F1DE"/></g>
+  <text x="60" y="116" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#F4F1DE">HCF</text>
+</svg>
