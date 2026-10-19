@@ -1,0 +1,16 @@
+{
+  "match_id": "hcf-nbr-default-s42",
+  "seed": 42,
+  "scenario": "default",
+  "home": "HCF",
+  "away": "NBR",
+  "generator": "pitchside-sim 0.1.0",
+  "counts": {
+    "events": 1949,
+    "tracking": 0
+  },
+  "score": {
+    "HCF": 3,
+    "NBR": 3
+  }
+}

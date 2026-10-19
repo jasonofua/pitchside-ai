@@ -1,0 +1,16 @@
+{
+  "match_id": "lag-hcf-default-s42",
+  "seed": 42,
+  "scenario": "default",
+  "home": "LAG",
+  "away": "HCF",
+  "generator": "pitchside-sim 0.1.0",
+  "counts": {
+    "events": 1905,
+    "tracking": 0
+  },
+  "score": {
+    "LAG": 2,
+    "HCF": 5
+  }
+}

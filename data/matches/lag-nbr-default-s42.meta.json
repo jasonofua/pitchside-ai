@@ -1,0 +1,16 @@
+{
+  "match_id": "lag-nbr-default-s42",
+  "seed": 42,
+  "scenario": "default",
+  "home": "LAG",
+  "away": "NBR",
+  "generator": "pitchside-sim 0.1.0",
+  "counts": {
+    "events": 2125,
+    "tracking": 0
+  },
+  "score": {
+    "LAG": 2,
+    "NBR": 0
+  }
+}

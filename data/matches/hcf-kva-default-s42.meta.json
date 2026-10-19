@@ -1,0 +1,16 @@
+{
+  "match_id": "hcf-kva-default-s42",
+  "seed": 42,
+  "scenario": "default",
+  "home": "HCF",
+  "away": "KVA",
+  "generator": "pitchside-sim 0.1.0",
+  "counts": {
+    "events": 2114,
+    "tracking": 0
+  },
+  "score": {
+    "HCF": 1,
+    "KVA": 1
+  }
+}

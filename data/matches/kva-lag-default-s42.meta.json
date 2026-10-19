@@ -1,0 +1,16 @@
+{
+  "match_id": "kva-lag-default-s42",
+  "seed": 42,
+  "scenario": "default",
+  "home": "KVA",
+  "away": "LAG",
+  "generator": "pitchside-sim 0.1.0",
+  "counts": {
+    "events": 1918,
+    "tracking": 0
+  },
+  "score": {
+    "KVA": 0,
+    "LAG": 2
+  }
+}
