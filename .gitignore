@@ -9,10 +9,17 @@ __pycache__/
 dist/
 build/
 
-# Node (web/, from Day 5)
+# Node (web/)
 node_modules/
 .next/
 .pnpm-store/
+web/out/
+web/test-results/
+web/playwright-report/
+*.tsbuildinfo
+
+# Local runtime data (SQLite event log)
+data/runtime/
 
 # Local config and secrets
 .env
