@@ -1,0 +1,689 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:pitchside:schema:agents:1",
+  "title": "AgentTrace",
+  "description": "One step of the agent workflow, as shown in the Director panel's live trace. The $defs are the typed messages agents hand to each other; every handoff carries trace_id and moment_id.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "trace_id",
+    "match_id",
+    "agent",
+    "model",
+    "status",
+    "latency_ms",
+    "clock_ms",
+    "at"
+  ],
+  "properties": {
+    "trace_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "match_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "moment_id": {
+      "type": "string"
+    },
+    "agent": {
+      "$ref": "#/$defs/AgentName"
+    },
+    "model": {
+      "description": "Deployment used: the large or small model name, 'code' for deterministic steps, or 'mock' offline.",
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "ok",
+        "skipped",
+        "timeout",
+        "error",
+        "fallback",
+        "rejected",
+        "regenerated",
+        "circuit_open",
+        "dropped"
+      ]
+    },
+    "latency_ms": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "clock_ms": {
+      "description": "Match clock when the step finished.",
+      "type": "integer",
+      "minimum": 0
+    },
+    "at": {
+      "description": "Wall-clock ISO 8601 time the step finished.",
+      "type": "string"
+    },
+    "detail": {
+      "type": "string",
+      "maxLength": 500
+    },
+    "tools": {
+      "description": "MCP tools the agent called.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "profile_hash": {
+      "type": "string"
+    }
+  },
+  "$defs": {
+    "AgentName": {
+      "type": "string",
+      "enum": [
+        "moment_detector",
+        "tactical_analyst",
+        "narrator",
+        "fan_lens",
+        "localizer",
+        "fact_checker",
+        "producer"
+      ]
+    },
+    "Lang": {
+      "type": "string",
+      "enum": [
+        "en",
+        "pcm",
+        "yo",
+        "fr",
+        "es"
+      ]
+    },
+    "Mode": {
+      "type": "string",
+      "enum": [
+        "analyst",
+        "casual",
+        "player_cam",
+        "kids"
+      ]
+    },
+    "Ulid": {
+      "type": "string",
+      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    },
+    "MomentKind": {
+      "type": "string",
+      "enum": [
+        "goal",
+        "big_chance",
+        "card",
+        "speed_burst",
+        "hard_pass",
+        "momentum_swing",
+        "spell",
+        "half_time",
+        "full_time"
+      ]
+    },
+    "Moment": {
+      "description": "Output of the Moment Detector.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "moment_id",
+        "match_id",
+        "trace_id",
+        "trigger_id",
+        "kind",
+        "period",
+        "clock_ms",
+        "minute",
+        "importance",
+        "summary",
+        "evidence_event_ids"
+      ],
+      "properties": {
+        "moment_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "match_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "trace_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "trigger_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "$ref": "#/$defs/MomentKind"
+        },
+        "period": {
+          "type": "integer",
+          "enum": [
+            1,
+            2
+          ]
+        },
+        "clock_ms": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "minute": {
+          "type": "string"
+        },
+        "importance": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "team_id": {
+          "type": "string"
+        },
+        "player_id": {
+          "type": "string"
+        },
+        "summary": {
+          "description": "One factual line, no numbers beyond the trigger's own value.",
+          "type": "string",
+          "maxLength": 200
+        },
+        "evidence_event_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Ulid"
+          }
+        }
+      }
+    },
+    "StatCitation": {
+      "description": "A number an agent used, with where it came from.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "label",
+        "value",
+        "source"
+      ],
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "value": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "unit": {
+          "type": "string"
+        },
+        "source": {
+          "description": "MCP tool and field, e.g. 'get_team_stats.LAG.possession_pct'.",
+          "type": "string"
+        }
+      }
+    },
+    "Insight": {
+      "description": "Output of the Tactical Analyst.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "insight_id",
+        "moment_id",
+        "match_id",
+        "trace_id",
+        "headline",
+        "why_it_matters",
+        "stats_cited"
+      ],
+      "properties": {
+        "insight_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "moment_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "match_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "trace_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "headline": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "why_it_matters": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "stats_cited": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/StatCitation"
+          }
+        },
+        "team_id": {
+          "type": "string"
+        },
+        "player_id": {
+          "type": "string"
+        }
+      }
+    },
+    "Commentary": {
+      "description": "Output of the Narrator.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "commentary_id",
+        "moment_id",
+        "match_id",
+        "trace_id",
+        "kind",
+        "text",
+        "stats_cited"
+      ],
+      "properties": {
+        "commentary_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "moment_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "match_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "trace_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "line",
+            "half_time_story",
+            "full_time_recap"
+          ]
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 900
+        },
+        "stats_cited": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/StatCitation"
+          }
+        }
+      }
+    },
+    "CardDraft": {
+      "description": "A profile-specific card from the Fan Lens, localised by the Localizer, checked by the Fact Checker.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "draft_id",
+        "moment_id",
+        "match_id",
+        "trace_id",
+        "profile_hash",
+        "mode",
+        "lang",
+        "kind",
+        "title",
+        "body",
+        "stats",
+        "evidence_event_ids",
+        "importance",
+        "source"
+      ],
+      "properties": {
+        "draft_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "moment_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "match_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "trace_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "profile_hash": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mode": {
+          "$ref": "#/$defs/Mode"
+        },
+        "lang": {
+          "$ref": "#/$defs/Lang"
+        },
+        "kind": {
+          "$ref": "#/$defs/MomentKind"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "body": {
+          "type": "string",
+          "maxLength": 600
+        },
+        "stats": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/StatItem"
+          }
+        },
+        "evidence_event_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Ulid"
+          }
+        },
+        "importance": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "player_id": {
+          "type": "string"
+        },
+        "team_id": {
+          "type": "string"
+        },
+        "source": {
+          "description": "agent: written by models. template: the stats-only fallback.",
+          "type": "string",
+          "enum": [
+            "agent",
+            "template"
+          ]
+        },
+        "replaces": {
+          "description": "draft_id of a template card this upgraded card replaces.",
+          "type": "string"
+        }
+      }
+    },
+    "Mismatch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cited",
+        "reason"
+      ],
+      "properties": {
+        "cited": {
+          "type": "string",
+          "description": "The figure as written in the card."
+        },
+        "expected": {
+          "type": "string",
+          "description": "What match state says, if known."
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "FactCheck": {
+      "description": "Output of the Fact Checker.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "draft_id",
+        "verdict",
+        "numbers_checked",
+        "mismatches"
+      ],
+      "properties": {
+        "draft_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "verdict": {
+          "type": "string",
+          "enum": [
+            "pass",
+            "reject"
+          ]
+        },
+        "numbers_checked": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "mismatches": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Mismatch"
+          }
+        }
+      }
+    },
+    "StatItem": {
+      "description": "Same shape as the overlay contract's StatItem.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "label",
+        "value"
+      ],
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "value": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "unit": {
+          "type": "string"
+        }
+      }
+    },
+    "Story": {
+      "description": "What flows from the Narrator to the Fan Lens: the moment, plus the insight and commentary when they exist.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "moment"
+      ],
+      "properties": {
+        "moment": {
+          "$ref": "#/$defs/Moment"
+        },
+        "insight": {
+          "$ref": "#/$defs/Insight"
+        },
+        "commentary": {
+          "$ref": "#/$defs/Commentary"
+        }
+      }
+    },
+    "MomentDecision": {
+      "description": "Structured output of the Moment Detector model.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "is_moment",
+        "kind",
+        "importance",
+        "summary"
+      ],
+      "properties": {
+        "is_moment": {
+          "type": "boolean"
+        },
+        "kind": {
+          "$ref": "#/$defs/MomentKind"
+        },
+        "importance": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "summary": {
+          "type": "string",
+          "maxLength": 200
+        }
+      }
+    },
+    "InsightDraft": {
+      "description": "Structured output of the Tactical Analyst model.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "headline",
+        "why_it_matters",
+        "stats_cited"
+      ],
+      "properties": {
+        "headline": {
+          "type": "string",
+          "maxLength": 120
+        },
+        "why_it_matters": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "stats_cited": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/StatCitation"
+          }
+        }
+      }
+    },
+    "CommentaryDraft": {
+      "description": "Structured output of the Narrator model.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "text",
+        "stats_cited"
+      ],
+      "properties": {
+        "text": {
+          "type": "string",
+          "maxLength": 900
+        },
+        "stats_cited": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/StatCitation"
+          }
+        }
+      }
+    },
+    "CardText": {
+      "description": "Structured output of the Fan Lens and Localizer models.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "body",
+        "stats"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "maxLength": 120
+        },
+        "body": {
+          "type": "string",
+          "maxLength": 600
+        },
+        "stats": {
+          "type": "array",
+          "maxItems": 4,
+          "items": {
+            "$ref": "#/$defs/StatItem"
+          }
+        }
+      }
+    },
+    "ClaimCheck": {
+      "description": "Structured output of the Fact Checker model (qualitative claims; numbers are checked in code).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "verdict",
+        "reason"
+      ],
+      "properties": {
+        "verdict": {
+          "type": "string",
+          "enum": [
+            "pass",
+            "reject"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "maxLength": 300
+        }
+      }
+    },
+    "ProducerPlan": {
+      "description": "Structured output of the Producer model: where and how long a card shows.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "slot",
+        "priority",
+        "ttl_s"
+      ],
+      "properties": {
+        "slot": {
+          "type": "string",
+          "enum": [
+            "lower_third",
+            "corner_bug",
+            "player_tag",
+            "full_card",
+            "ticker"
+          ]
+        },
+        "priority": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "ttl_s": {
+          "type": "integer",
+          "minimum": 4,
+          "maximum": 60
+        }
+      }
+    }
+  }
+}

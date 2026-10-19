@@ -4,11 +4,9 @@ from __future__ import annotations
 
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, RootModel
+from pydantic import BaseModel, ConfigDict, Field
 
-
-class EvidenceEventId(RootModel[str]):
-    root: Annotated[str, Field(pattern="^[0-9A-HJKMNP-TV-Z]{26}$")]
+type EvidenceEventId = Annotated[str, Field(pattern="^[0-9A-HJKMNP-TV-Z]{26}$")]
 
 
 class StatItem(BaseModel):
@@ -56,3 +54,19 @@ class OverlayCard(BaseModel):
     stats: list[StatItem]
     evidence_event_ids: list[EvidenceEventId]
     trace_id: Annotated[str, Field(min_length=1)]
+    kind: Annotated[str | None, Field(min_length=1)] = None
+    """
+    What kind of moment the card is about (goal, big_chance, speed_burst, ...), for renderers that style by kind.
+    """
+    player_id: Annotated[str | None, Field(pattern="^[A-Z]{3}-[0-9]{2}$")] = None
+    """
+    The player a player_tag (or Player Cam card) is attached to.
+    """
+    team_id: Annotated[str | None, Field(pattern="^[A-Z]{3}$")] = None
+    """
+    The club the card is about, for club colours.
+    """
+    source: Literal["agent", "template"] | None = None
+    """
+    agent: written by the agent crew. template: the stats-only fallback.
+    """

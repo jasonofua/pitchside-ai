@@ -21,15 +21,23 @@
     "trace_id"
   ],
   "properties": {
-    "overlay_id": { "type": "string", "minLength": 1 },
-    "match_id": { "type": "string", "minLength": 1 },
+    "overlay_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "match_id": {
+      "type": "string",
+      "minLength": 1
+    },
     "clock_ms": {
       "description": "Match clock at which the card should appear.",
       "type": "integer",
       "minimum": 0,
       "maximum": 7200000
     },
-    "slot": { "$ref": "#/$defs/Slot" },
+    "slot": {
+      "$ref": "#/$defs/Slot"
+    },
     "priority": {
       "description": "1 = lowest, 5 = must show now.",
       "type": "integer",
@@ -46,37 +54,102 @@
       "type": "string",
       "minLength": 1
     },
-    "lang": { "$ref": "#/$defs/Lang" },
-    "title": { "type": "string", "minLength": 1, "maxLength": 120 },
-    "body": { "type": "string", "maxLength": 600 },
+    "lang": {
+      "$ref": "#/$defs/Lang"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "body": {
+      "type": "string",
+      "maxLength": 600
+    },
     "stats": {
       "type": "array",
-      "items": { "$ref": "#/$defs/StatItem" }
+      "items": {
+        "$ref": "#/$defs/StatItem"
+      }
     },
     "evidence_event_ids": {
       "type": "array",
-      "items": { "type": "string", "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$" }
+      "items": {
+        "type": "string",
+        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      }
     },
-    "trace_id": { "type": "string", "minLength": 1 }
+    "trace_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "kind": {
+      "description": "What kind of moment the card is about (goal, big_chance, speed_burst, ...), for renderers that style by kind.",
+      "type": "string",
+      "minLength": 1
+    },
+    "player_id": {
+      "description": "The player a player_tag (or Player Cam card) is attached to.",
+      "type": "string",
+      "pattern": "^[A-Z]{3}-[0-9]{2}$"
+    },
+    "team_id": {
+      "description": "The club the card is about, for club colours.",
+      "type": "string",
+      "pattern": "^[A-Z]{3}$"
+    },
+    "source": {
+      "description": "agent: written by the agent crew. template: the stats-only fallback.",
+      "type": "string",
+      "enum": [
+        "agent",
+        "template"
+      ]
+    }
   },
   "$defs": {
     "Slot": {
       "type": "string",
-      "enum": ["lower_third", "corner_bug", "player_tag", "full_card", "ticker"]
+      "enum": [
+        "lower_third",
+        "corner_bug",
+        "player_tag",
+        "full_card",
+        "ticker"
+      ]
     },
     "Lang": {
       "description": "en = English, pcm = Nigerian Pidgin, yo = Yoruba, fr = French, es = Spanish.",
       "type": "string",
-      "enum": ["en", "pcm", "yo", "fr", "es"]
+      "enum": [
+        "en",
+        "pcm",
+        "yo",
+        "fr",
+        "es"
+      ]
     },
     "StatItem": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["label", "value"],
+      "required": [
+        "label",
+        "value"
+      ],
       "properties": {
-        "label": { "type": "string", "minLength": 1 },
-        "value": { "type": ["number", "string"] },
-        "unit": { "type": "string" }
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "value": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "unit": {
+          "type": "string"
+        }
       }
     }
   }

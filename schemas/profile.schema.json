@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:pitchside:schema:profile:1",
+  "title": "Profile",
+  "description": "A viewer's personalization profile, set in the onboarding sheet, kept in the browser and sent with the WebSocket subscription. Cards are written per profile hash.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["mode", "language"],
+  "properties": {
+    "mode": {
+      "description": "analyst: dense, tactical. casual: short, emotional, no jargon. player_cam: everything about one player. kids: simple and upbeat.",
+      "type": "string",
+      "enum": ["analyst", "casual", "player_cam", "kids"]
+    },
+    "language": {
+      "description": "en = English, pcm = Nigerian Pidgin, yo = Yoruba, fr = French, es = Spanish.",
+      "type": "string",
+      "enum": ["en", "pcm", "yo", "fr", "es"]
+    },
+    "favorite_club": { "type": "string", "pattern": "^[A-Z]{3}$" },
+    "favorite_player": { "type": "string", "pattern": "^[A-Z]{3}-[0-9]{2}$" },
+    "focus_metric": {
+      "description": "The one stat shown in a persistent bug.",
+      "type": "string",
+      "enum": ["shot_speed", "top_speed", "distance", "possession", "xg", "pass_accuracy", "momentum"]
+    }
+  }
+}

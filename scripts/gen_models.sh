@@ -4,7 +4,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-for name in event tracking overlay world; do
+for name in event tracking overlay world match trigger stats scenario profile agents; do
   uv run --frozen datamodel-codegen \
     --input "schemas/${name}.schema.json" \
     --input-file-type jsonschema \
@@ -18,6 +18,7 @@ for name in event tracking overlay world; do
     --enum-field-as-literal all \
     --use-title-as-name \
     --collapse-root-models \
+    --use-type-alias \
     --use-schema-description \
     --use-field-description \
     --use-double-quotes \

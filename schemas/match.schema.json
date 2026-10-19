@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:pitchside:schema:match:1",
+  "title": "MatchInfo",
+  "description": "Metadata for one simulated match, published before kickoff so downstream services know which team is home (tracking frames are in the home team's frame).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["match_id", "home", "away", "scenario", "seed", "speed", "status"],
+  "properties": {
+    "match_id": { "type": "string", "minLength": 1 },
+    "home": { "type": "string", "pattern": "^[A-Z]{3}$" },
+    "away": { "type": "string", "pattern": "^[A-Z]{3}$" },
+    "scenario": { "type": "string", "minLength": 1 },
+    "seed": { "type": "integer" },
+    "speed": {
+      "description": "Match-clock speed multiplier; 0 means unpaced.",
+      "type": "number",
+      "minimum": 0
+    },
+    "status": { "$ref": "#/$defs/MatchStatus" },
+    "created_at": {
+      "description": "ISO 8601 wall-clock time the match was started.",
+      "type": "string"
+    }
+  },
+  "$defs": {
+    "MatchStatus": {
+      "type": "string",
+      "enum": ["scheduled", "live", "half_time", "full_time", "aborted"]
+    }
+  }
+}

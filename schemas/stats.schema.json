@@ -1,0 +1,1146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:pitchside:schema:stats:1",
+  "title": "StatsSnapshot",
+  "description": "Published by the Stats Engine after events that change the numbers (throttled). Feeds the scoreboard, corner stat bug, momentum ribbon and player tags. The $defs are the payloads of the Match Stats MCP tools.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "match_id",
+    "seq",
+    "status",
+    "period",
+    "clock_ms",
+    "clock_display",
+    "minute",
+    "teams",
+    "momentum",
+    "players"
+  ],
+  "properties": {
+    "match_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "seq": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "status": {
+      "$ref": "#/$defs/MatchStatus"
+    },
+    "period": {
+      "type": "integer",
+      "enum": [
+        1,
+        2
+      ]
+    },
+    "clock_ms": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 7200000
+    },
+    "clock_display": {
+      "$ref": "#/$defs/ClockDisplay"
+    },
+    "minute": {
+      "$ref": "#/$defs/Minute"
+    },
+    "teams": {
+      "description": "Home first.",
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "$ref": "#/$defs/TeamStats"
+      }
+    },
+    "momentum": {
+      "$ref": "#/$defs/MomentumNow"
+    },
+    "players": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/PlayerLine"
+      }
+    }
+  },
+  "$defs": {
+    "ClockDisplay": {
+      "description": "Broadcast clock, e.g. '67:12' or '45+02:18' in stoppage time.",
+      "type": "string",
+      "pattern": "^[0-9]{2,3}:[0-9]{2}$|^(45|90)\\+[0-9]{2}:[0-9]{2}$"
+    },
+    "Minute": {
+      "description": "Football minute, e.g. \"68'\" or \"90+3'\".",
+      "type": "string",
+      "pattern": "^[0-9]{1,3}'$|^(45|90)\\+[0-9]{1,2}'$"
+    },
+    "Window": {
+      "description": "Time window for stats: the whole match, one half, or the last N minutes of playing time.",
+      "type": "string",
+      "enum": [
+        "match",
+        "first_half",
+        "second_half",
+        "last_5",
+        "last_10",
+        "last_15"
+      ]
+    },
+    "TeamStats": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "team_id",
+        "name",
+        "short_name",
+        "goals",
+        "shots",
+        "shots_on_target",
+        "xg",
+        "max_shot_speed_kmh",
+        "passes",
+        "passes_completed",
+        "pass_accuracy_pct",
+        "avg_pass_distance_m",
+        "avg_pass_speed_kmh",
+        "avg_pass_difficulty",
+        "difficult_passes_completed",
+        "possession_pct",
+        "pressures",
+        "tackles",
+        "tackles_won",
+        "interceptions",
+        "fouls",
+        "yellow_cards",
+        "red_cards",
+        "corners",
+        "turnovers",
+        "ppda",
+        "distance_km",
+        "sprints",
+        "top_speed_kmh"
+      ],
+      "properties": {
+        "team_id": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "name": {
+          "type": "string"
+        },
+        "short_name": {
+          "type": "string"
+        },
+        "goals": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "shots": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "shots_on_target": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "xg": {
+          "description": "Sum of shot xG, 2 dp.",
+          "type": "number",
+          "minimum": 0
+        },
+        "max_shot_speed_kmh": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "passes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "passes_completed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "pass_accuracy_pct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "avg_pass_distance_m": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "avg_pass_speed_kmh": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "avg_pass_difficulty": {
+          "description": "Mean pass difficulty, 0-100.",
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "difficult_passes_completed": {
+          "description": "Completed passes with difficulty above 80.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "possession_pct": {
+          "description": "Share of ball-in-play time, 1 dp.",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "pressures": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "tackles": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "tackles_won": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "interceptions": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "fouls": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "yellow_cards": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "red_cards": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "corners": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "turnovers": {
+          "description": "Possessions lost other than by shooting.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "ppda": {
+          "description": "Opponent passes allowed per defensive action in the opponent's first 60% of the pitch. Lower means a more intense press. Null when there were no defensive actions.",
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "distance_km": {
+          "type": "number",
+          "minimum": 0
+        },
+        "sprints": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "top_speed_kmh": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      }
+    },
+    "PlayerStats": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "player_id",
+        "name",
+        "short_name",
+        "team_id",
+        "shirt_number",
+        "position",
+        "on_pitch",
+        "minutes_played",
+        "touches",
+        "passes",
+        "passes_completed",
+        "pass_accuracy_pct",
+        "avg_pass_difficulty",
+        "max_pass_difficulty",
+        "key_passes",
+        "shots",
+        "shots_on_target",
+        "goals",
+        "xg",
+        "max_shot_speed_kmh",
+        "pressures",
+        "tackles_won",
+        "interceptions",
+        "fouls",
+        "yellow_cards",
+        "red_cards",
+        "distance_km",
+        "sprints",
+        "top_speed_kmh"
+      ],
+      "properties": {
+        "player_id": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}-[0-9]{2}$"
+        },
+        "name": {
+          "type": "string"
+        },
+        "short_name": {
+          "type": "string"
+        },
+        "team_id": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "shirt_number": {
+          "type": "integer"
+        },
+        "position": {
+          "type": "string"
+        },
+        "on_pitch": {
+          "type": "boolean"
+        },
+        "minutes_played": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "touches": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "passes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "passes_completed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "pass_accuracy_pct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "avg_pass_difficulty": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "max_pass_difficulty": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "key_passes": {
+          "description": "Completed passes after which the receiver's next action was a shot.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "shots": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "shots_on_target": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "goals": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "xg": {
+          "type": "number",
+          "minimum": 0
+        },
+        "max_shot_speed_kmh": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "pressures": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "tackles_won": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "interceptions": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "fouls": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "yellow_cards": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "red_cards": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "distance_km": {
+          "type": "number",
+          "minimum": 0
+        },
+        "sprints": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "top_speed_kmh": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "heatmap": {
+          "$ref": "#/$defs/Heatmap"
+        }
+      }
+    },
+    "Heatmap": {
+      "description": "Share of tracked time in each zone, in the player's attacking frame (towards x=105). cells is row-major, rows from y=0, values sum to 1.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cols",
+        "rows",
+        "cells"
+      ],
+      "properties": {
+        "cols": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "rows": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "cells": {
+          "type": "array",
+          "items": {
+            "type": "number",
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "PlayerLine": {
+      "description": "Compact live line per player for the match screen and player tags.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "player_id",
+        "team_id",
+        "on_pitch",
+        "touches",
+        "passes",
+        "passes_completed",
+        "shots",
+        "goals",
+        "xg",
+        "distance_km",
+        "top_speed_kmh",
+        "speed_kmh"
+      ],
+      "properties": {
+        "player_id": {
+          "type": "string"
+        },
+        "team_id": {
+          "type": "string"
+        },
+        "on_pitch": {
+          "type": "boolean"
+        },
+        "touches": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "passes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "passes_completed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "shots": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "goals": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "xg": {
+          "type": "number",
+          "minimum": 0
+        },
+        "distance_km": {
+          "type": "number",
+          "minimum": 0
+        },
+        "top_speed_kmh": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "speed_kmh": {
+          "description": "Current speed, smoothed over 0.6 s.",
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "TeamLine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "team_id",
+        "name",
+        "short_name",
+        "score",
+        "red_cards",
+        "color"
+      ],
+      "properties": {
+        "team_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "short_name": {
+          "type": "string"
+        },
+        "score": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "red_cards": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "color": {
+          "type": "string"
+        }
+      }
+    },
+    "GoalItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "event_id",
+        "team_id",
+        "player_id",
+        "player_name",
+        "minute",
+        "period",
+        "clock_ms",
+        "score_after"
+      ],
+      "properties": {
+        "event_id": {
+          "type": "string"
+        },
+        "team_id": {
+          "type": "string"
+        },
+        "player_id": {
+          "type": "string"
+        },
+        "player_name": {
+          "type": "string"
+        },
+        "minute": {
+          "$ref": "#/$defs/Minute"
+        },
+        "period": {
+          "type": "integer",
+          "enum": [
+            1,
+            2
+          ]
+        },
+        "clock_ms": {
+          "type": "integer"
+        },
+        "xg": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "shot_speed_kmh": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "score_after": {
+          "description": "Home-away, e.g. '2-1'.",
+          "type": "string"
+        }
+      }
+    },
+    "CardItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "event_id",
+        "team_id",
+        "player_id",
+        "player_name",
+        "minute",
+        "card_color"
+      ],
+      "properties": {
+        "event_id": {
+          "type": "string"
+        },
+        "team_id": {
+          "type": "string"
+        },
+        "player_id": {
+          "type": "string"
+        },
+        "player_name": {
+          "type": "string"
+        },
+        "minute": {
+          "$ref": "#/$defs/Minute"
+        },
+        "card_color": {
+          "type": "string",
+          "enum": [
+            "yellow",
+            "second_yellow",
+            "red"
+          ]
+        }
+      }
+    },
+    "MatchState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "match_id",
+        "status",
+        "scenario",
+        "period",
+        "clock_ms",
+        "clock_display",
+        "minute",
+        "seq",
+        "home",
+        "away",
+        "possession_team_id",
+        "goals",
+        "cards",
+        "momentum"
+      ],
+      "properties": {
+        "match_id": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/MatchStatus"
+        },
+        "scenario": {
+          "type": "string"
+        },
+        "period": {
+          "type": "integer",
+          "enum": [
+            1,
+            2
+          ]
+        },
+        "clock_ms": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "clock_display": {
+          "$ref": "#/$defs/ClockDisplay"
+        },
+        "minute": {
+          "$ref": "#/$defs/Minute"
+        },
+        "seq": {
+          "description": "Last processed event seq, -1 before kickoff.",
+          "type": "integer"
+        },
+        "home": {
+          "$ref": "#/$defs/TeamLine"
+        },
+        "away": {
+          "$ref": "#/$defs/TeamLine"
+        },
+        "possession_team_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "goals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/GoalItem"
+          }
+        },
+        "cards": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CardItem"
+          }
+        },
+        "momentum": {
+          "$ref": "#/$defs/MomentumNow"
+        }
+      }
+    },
+    "MomentumNow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "index",
+        "swing",
+        "dominant_team_id"
+      ],
+      "properties": {
+        "index": {
+          "description": "Control vs Chaos index over the last 5 minutes: +100 = full control, -100 = full chaos.",
+          "type": "number",
+          "minimum": -100,
+          "maximum": 100
+        },
+        "swing": {
+          "description": "Change in the index over the last 5 minutes.",
+          "type": "number"
+        },
+        "dominant_team_id": {
+          "description": "Team with more than 55% of ball-in-play possession in the window; null when the split is closer.",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "MomentumComponents": {
+      "description": "Each component in [-1, 1]; positive pulls towards control.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stability",
+        "turnovers",
+        "pressure",
+        "tempo"
+      ],
+      "properties": {
+        "stability": {
+          "type": "number",
+          "minimum": -1,
+          "maximum": 1
+        },
+        "turnovers": {
+          "type": "number",
+          "minimum": -1,
+          "maximum": 1
+        },
+        "pressure": {
+          "type": "number",
+          "minimum": -1,
+          "maximum": 1
+        },
+        "tempo": {
+          "type": "number",
+          "minimum": -1,
+          "maximum": 1
+        }
+      }
+    },
+    "MomentumPoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "period",
+        "clock_ms",
+        "minute",
+        "index",
+        "home_share",
+        "components"
+      ],
+      "properties": {
+        "period": {
+          "type": "integer",
+          "enum": [
+            1,
+            2
+          ]
+        },
+        "clock_ms": {
+          "type": "integer"
+        },
+        "minute": {
+          "$ref": "#/$defs/Minute"
+        },
+        "index": {
+          "type": "number",
+          "minimum": -100,
+          "maximum": 100
+        },
+        "home_share": {
+          "description": "Home share of ball-in-play possession in the 5-minute window, 0-1.",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "components": {
+          "$ref": "#/$defs/MomentumComponents"
+        }
+      }
+    },
+    "Momentum": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "match_id",
+        "window",
+        "now",
+        "points"
+      ],
+      "properties": {
+        "match_id": {
+          "type": "string"
+        },
+        "window": {
+          "$ref": "#/$defs/Window"
+        },
+        "now": {
+          "$ref": "#/$defs/MomentumNow"
+        },
+        "points": {
+          "description": "The index every 30 s of match time inside the requested window.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/MomentumPoint"
+          }
+        }
+      }
+    },
+    "TeamStatsReport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "match_id",
+        "window",
+        "minute",
+        "teams"
+      ],
+      "properties": {
+        "match_id": {
+          "type": "string"
+        },
+        "window": {
+          "$ref": "#/$defs/Window"
+        },
+        "minute": {
+          "$ref": "#/$defs/Minute"
+        },
+        "teams": {
+          "description": "Home first.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/TeamStats"
+          }
+        }
+      }
+    },
+    "PeriodComparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "match_id",
+        "first_half",
+        "second_half"
+      ],
+      "properties": {
+        "match_id": {
+          "type": "string"
+        },
+        "first_half": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/TeamStats"
+          }
+        },
+        "second_half": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/TeamStats"
+          }
+        }
+      }
+    },
+    "MatchStatus": {
+      "type": "string",
+      "enum": [
+        "scheduled",
+        "live",
+        "half_time",
+        "full_time",
+        "aborted"
+      ]
+    },
+    "ShotMapItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "event_id",
+        "team_id",
+        "player_id",
+        "player_name",
+        "minute",
+        "x",
+        "y",
+        "outcome",
+        "xg",
+        "body_part",
+        "speed_kmh"
+      ],
+      "properties": {
+        "event_id": {
+          "type": "string"
+        },
+        "team_id": {
+          "type": "string"
+        },
+        "player_id": {
+          "type": "string"
+        },
+        "player_name": {
+          "type": "string"
+        },
+        "minute": {
+          "$ref": "#/$defs/Minute"
+        },
+        "x": {
+          "description": "Shooting team's frame (towards x=105).",
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "outcome": {
+          "type": "string",
+          "enum": [
+            "complete",
+            "saved",
+            "blocked",
+            "off_target"
+          ]
+        },
+        "xg": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "body_part": {
+          "type": "string"
+        },
+        "speed_kmh": {
+          "type": "number"
+        }
+      }
+    },
+    "NetworkNode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "player_id",
+        "short_name",
+        "shirt_number",
+        "x",
+        "y",
+        "passes"
+      ],
+      "properties": {
+        "player_id": {
+          "type": "string"
+        },
+        "short_name": {
+          "type": "string"
+        },
+        "shirt_number": {
+          "type": "integer"
+        },
+        "x": {
+          "description": "Mean position of the player's passes and receptions, team frame.",
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "passes": {
+          "description": "Completed passes made.",
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "NetworkEdge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "target",
+        "count"
+      ],
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "target": {
+          "type": "string"
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "PassNetwork": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "team_id",
+        "nodes",
+        "edges"
+      ],
+      "properties": {
+        "team_id": {
+          "type": "string"
+        },
+        "nodes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NetworkNode"
+          }
+        },
+        "edges": {
+          "description": "Completed passes between two players (either direction), at least 3.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NetworkEdge"
+          }
+        }
+      }
+    },
+    "DifficultyHistogram": {
+      "description": "Pass counts per 10-point difficulty bin (0-10, 10-20, ... 90-100).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "team_id",
+        "completed",
+        "incomplete"
+      ],
+      "properties": {
+        "team_id": {
+          "type": "string"
+        },
+        "completed": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "minItems": 10,
+          "maxItems": 10
+        },
+        "incomplete": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "minItems": 10,
+          "maxItems": 10
+        }
+      }
+    },
+    "AnalystReport": {
+      "description": "Everything the Analyst dashboard draws, computed by the Stats Engine.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "match_id",
+        "minute",
+        "shots",
+        "networks",
+        "histograms",
+        "momentum"
+      ],
+      "properties": {
+        "match_id": {
+          "type": "string"
+        },
+        "minute": {
+          "$ref": "#/$defs/Minute"
+        },
+        "shots": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ShotMapItem"
+          }
+        },
+        "networks": {
+          "description": "Home first.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PassNetwork"
+          }
+        },
+        "histograms": {
+          "description": "Home first.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/DifficultyHistogram"
+          }
+        },
+        "momentum": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/MomentumPoint"
+          }
+        }
+      }
+    }
+  }
+}

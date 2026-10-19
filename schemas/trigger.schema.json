@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:pitchside:schema:trigger:1",
+  "title": "Trigger",
+  "description": "Raised by the Stats Engine when a threshold is crossed, a key event happens, or 30 s of match time pass. The Moment Detector runs on every trigger.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["trigger_id", "match_id", "kind", "seq", "clock_ms", "period", "event_ids"],
+  "properties": {
+    "trigger_id": {
+      "description": "Deterministic: '<match_id>:<kind>:<seq or frame clock>'.",
+      "type": "string",
+      "minLength": 1
+    },
+    "match_id": { "type": "string", "minLength": 1 },
+    "kind": { "$ref": "#/$defs/TriggerKind" },
+    "seq": {
+      "description": "seq of the last event the Stats Engine had processed when the trigger fired.",
+      "type": "integer",
+      "minimum": 0
+    },
+    "clock_ms": { "type": "integer", "minimum": 0, "maximum": 7200000 },
+    "period": { "type": "integer", "enum": [1, 2] },
+    "team_id": { "type": "string", "minLength": 1 },
+    "player_id": { "type": "string", "minLength": 1 },
+    "value": {
+      "description": "The measured value, e.g. 33.4 for a 33.4 km/h sprint.",
+      "type": "number"
+    },
+    "threshold": { "type": "number" },
+    "unit": { "type": "string" },
+    "event_ids": {
+      "description": "Evidence: the events behind the trigger (most recent last).",
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$" }
+    }
+  },
+  "$defs": {
+    "TriggerKind": {
+      "description": "speed: a player above 32 km/h. pass_difficulty: a completed pass above 80. xg: a shot above 0.3 xG. momentum_swing: the Control vs Chaos index moved 30+ points in 5 minutes. tick: 30 s of match time passed.",
+      "type": "string",
+      "enum": [
+        "speed",
+        "pass_difficulty",
+        "xg",
+        "goal",
+        "card",
+        "half_time",
+        "full_time",
+        "momentum_swing",
+        "tick"
+      ]
+    }
+  }
+}

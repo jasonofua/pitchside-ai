@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:pitchside:schema:scenario:1",
+  "title": "Scenario",
+  "description": "A scenario script (services/sim/scenarios/*.yaml) that injects story beats at set minutes so a demo match has a narrative arc.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "description", "scoring", "beats"],
+  "properties": {
+    "name": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+    "description": { "type": "string", "minLength": 1 },
+    "home": {
+      "description": "Default home club when the CLI does not pass --home.",
+      "type": "string",
+      "pattern": "^[A-Z]{3}$"
+    },
+    "away": { "type": "string", "pattern": "^[A-Z]{3}$" },
+    "favourite": {
+      "description": "Which side the story treats as the favourite; the other side is the underdog.",
+      "$ref": "#/$defs/Venue"
+    },
+    "scoring": {
+      "description": "free: shots score by the usual model. scripted: only goal beats score; every other shot that would have scored is saved.",
+      "type": "string",
+      "enum": ["free", "scripted"]
+    },
+    "stoppage_s": {
+      "description": "Override the stoppage-time range per period, in seconds.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "p1": { "$ref": "#/$defs/Range" },
+        "p2": { "$ref": "#/$defs/Range" }
+      }
+    },
+    "beats": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Beat" }
+    }
+  },
+  "$defs": {
+    "Venue": { "type": "string", "enum": ["home", "away"] },
+    "Side": {
+      "description": "A venue, or a story role resolved through `favourite`.",
+      "type": "string",
+      "enum": ["home", "away", "favourite", "underdog"]
+    },
+    "Range": {
+      "type": "array",
+      "items": { "type": "integer", "minimum": 0 },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "Beat": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["at", "kind", "team"],
+      "properties": {
+        "at": {
+          "description": "Match minute the beat lands on: '71' means 71:00, '90+2' means 92:00 in second-half stoppage.",
+          "type": "string",
+          "pattern": "^[0-9]{1,2}(\\+[0-9]{1,2})?$"
+        },
+        "kind": {
+          "description": "goal: the team scores at (or just after) `at`. red_card: the team's next foul from `at` is a straight red. modifiers: from `at`, the team plays with these multipliers.",
+          "type": "string",
+          "enum": ["goal", "red_card", "modifiers"]
+        },
+        "team": { "$ref": "#/$defs/Side" },
+        "modifiers": { "$ref": "#/$defs/Modifiers" },
+        "note": { "type": "string" }
+      },
+      "if": { "properties": { "kind": { "const": "modifiers" } } },
+      "then": { "required": ["modifiers"] }
+    },
+    "Modifiers": {
+      "description": "Multipliers on the engine's team model; 1.0 is neutral. Unset fields keep their current value.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "attack": { "type": "number", "minimum": 0.1, "maximum": 5 },
+        "press": { "type": "number", "minimum": 0.1, "maximum": 5 },
+        "fatigue": { "type": "number", "minimum": 0.1, "maximum": 5 },
+        "composure": { "type": "number", "minimum": 0.1, "maximum": 5 }
+      }
+    }
+  }
+}
