@@ -26,13 +26,20 @@ time ("Continue with Day N of docs/SPEC.md").
 ## Commands
 
 ```bash
-uv sync                                   # install (Python 3.12, dev tools included)
+uv sync --all-extras                      # install (Python 3.12, dev tools, Azure SDKs)
 uv run pytest                             # all tests, incl. the 50-run totals check
 uv run pytest -m "not slow"               # skip the 50-run check while iterating
 uv run ruff check . && uv run ruff format --check . && uv run mypy
 ./scripts/gen_models.sh                   # regenerate services/contracts from /schemas
+(cd web && pnpm gen:types)                # regenerate web/lib/contracts.ts from /schemas
 uv run python scripts/gen_world.py        # regenerate data/world.json and crests
 uv run python -m sim run --seed 42 --speed 5 --format pretty   # watch a match
+uv run python -m runtime.main             # everything locally on :8000 (serves web/out)
+uv run python scripts/explain_match.py --scenario comeback     # agents in the terminal
+uv run python -m evals.run                # agent evals over 30 seeded moments
+(cd web && pnpm build && pnpm test:e2e)   # site build; Playwright needs a running gateway
+docker compose up --build                 # local mode in one container
+azd up                                    # Azure (Bicep in infra/)
 ```
 
 ## Conventions that are easy to get wrong
@@ -47,4 +54,14 @@ uv run python -m sim run --seed 42 --speed 5 --format pretty   # watch a match
 - The simulator is deterministic for a given (teams, seed). Live runs must pass a fresh
   `--match-id` so event ids don't collide with earlier runs in the event log.
 - Each Python service is a top-level package under `services/` (`sim`, `contracts`, ...),
-  all built from the root `pyproject.toml`.
+  all built from the root `pyproject.toml`; `runtime.main --role` picks which run.
+- Agents get numbers only from MCP tool results (the Agent Framework MCP tool, or
+  `agents.stats_client` in code paths). Never pass computed stats into a prompt.
+- Prompts are versioned files: change a prompt by adding `<agent>.v<N+1>.md`, then rerun
+  `python -m evals.run`.
+- Without model settings the agents use `agents.mock_llm` (a real Agent Framework client),
+  so tests and local mode need no endpoint.
+- Phrases shown to viewers in five languages live in `agents/i18n.py` (and
+  `agents/mock_phrases.py` for the offline model); every key needs all five languages.
+- `mcp` stays on 1.x (Agent Framework's MCP tools) and `cryptography` below 49 (Intel
+  macOS wheels); see docs/DECISIONS.md D13.
