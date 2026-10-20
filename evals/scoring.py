@@ -17,12 +17,6 @@ YORUBA_MARKS = re.compile(r"[àáèéìíòóùúẹọṣ̀́]")
 FRENCH = re.compile(r"\b(le|la|les|des|du|est|une|un|pour|à|au|sur)\b", re.I)
 SPANISH = re.compile(r"\b(el|la|los|las|del|es|una|un|para|en|por|con)\b", re.I)
 ENGLISH_ONLY = re.compile(r"\b(the|and|is|with|from|they|their|have)\b", re.I)
-REAL_NAMES = re.compile(
-    r"\b(Premier League|La Liga|Serie A|Bundesliga|Ligue 1|Champions League|Arsenal|Chelsea|"
-    r"Liverpool|Barcelona|Real Madrid|Juventus|Bayern|PSG|Manchester|Messi|Ronaldo|Mbapp[eé]|"
-    r"Haaland|Super Eagles|NPFL|Enyimba)\b",
-    re.I,
-)
 
 
 @dataclass

@@ -4,7 +4,8 @@ state, lines short enough to read live."""
 from __future__ import annotations
 
 from evals.harness import Outcome
-from evals.scoring import REAL_NAMES, AgentScore, figures_ok, latency, rate
+from evals.scoring import AgentScore, figures_ok, latency, rate
+from runtime.realnames import real_names_in
 
 MUST_NARRATE = {"goal", "card", "half_time", "full_time"}
 LINE_MAX = 260
@@ -28,7 +29,7 @@ def score(outcomes: list[Outcome]) -> AgentScore:
             s.failures.append(f"{o.sample.sample_id}: unbacked figures {bad}")
         if c["kind"] == "line":
             s.check(len(c["text"]) <= LINE_MAX, f"{o.sample.sample_id}: line too long")
-        s.check(not REAL_NAMES.search(c["text"]), f"{o.sample.sample_id}: real-world name")
+        s.check(not real_names_in(c["text"]), f"{o.sample.sample_id}: real-world name")
     s.metrics["coverage"] = rate(produced, expected)
     s.metrics["number_accuracy"] = rate(accurate, produced)
     s.metrics.update(latency([

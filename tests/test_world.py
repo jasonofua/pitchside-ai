@@ -6,19 +6,13 @@ from collections import Counter
 from types import ModuleType
 
 from contracts import World
+from runtime.realnames import real_names_in
 from sim.formation import FORMATIONS
 
 from .conftest import ROOT, validator
 
 # Guard rail for the "fictional data only" rule: real leagues, governing bodies and a
 # sample of well-known club names must never appear in the world file.
-DENYLIST = [
-    "premier league", "laliga", "la liga", "serie a", "bundesliga", "ligue 1", "npfl",
-    "uefa", "fifa", "caf ", "arsenal", "chelsea", "liverpool", "manchester", "tottenham",
-    "barcelona", "real madrid", "atletico", "juventus", "milan", "inter ", "bayern",
-    "dortmund", "psg", "paris saint", "ajax", "benfica", "porto", "celtic", "rangers",
-    "enyimba", "kano pillars", "rivers united", "shooting stars", "hearts of oak", "kotoko",
-]  # fmt: skip
 
 
 def _load_generator() -> ModuleType:
@@ -65,5 +59,5 @@ def test_crests_exist(world: World) -> None:
 
 def test_world_contains_no_real_league_or_club_names() -> None:
     text = (ROOT / "data" / "world.json").read_text().lower()
-    hits = [term for term in DENYLIST if term in text]
+    hits = real_names_in(text)
     assert not hits, f"real-world names found: {hits}"

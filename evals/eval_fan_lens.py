@@ -5,7 +5,8 @@ accurate (measured by how often the Fact Checker had to reject)."""
 from __future__ import annotations
 
 from evals.harness import Outcome
-from evals.scoring import JARGON, REAL_NAMES, AgentScore, latency, rate
+from evals.scoring import JARGON, AgentScore, latency, rate
+from runtime.realnames import real_names_in
 
 
 def score(outcomes: list[Outcome]) -> AgentScore:
@@ -31,7 +32,7 @@ def score(outcomes: list[Outcome]) -> AgentScore:
             if profile.mode == "player_cam" and profile.favorite_player:
                 cam_cards += 1
                 cam_focused += o.names[profile.favorite_player] in text
-            s.check(not REAL_NAMES.search(text), f"{o.sample.sample_id}: real-world name")
+            s.check(not real_names_in(text), f"{o.sample.sample_id}: real-world name")
     s.metrics["agent_cards"] = cards
     s.metrics["mode_rules"] = rate(jargon_free, cards)
     s.metrics["player_cam_focus"] = rate(cam_focused, cam_cards)

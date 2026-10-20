@@ -114,3 +114,71 @@ quality), then the native-speaker review list for Pidgin and Yoruba.
 **Next (Day 5)**: the match screen in the browser (pitch, scoreboard, overlay rail, stat
 bug, momentum ribbon, player tags), the onboarding sheet, and the live match with agent
 cards in sync.
+
+## Days 5-6 — the screen, personalisation and recap (worked Oct 20)
+
+**Done**
+- Next.js static site (`web/`): the broadcast match screen (2D pitch interpolated to 60 fps
+  from 5 Hz tracking, scoreboard and clock, lower third over the pitch, full card, ticker,
+  corner stat bug for the viewer's focus metric, momentum ribbon, player tags), the
+  20-second onboarding sheet, Three Fans, Player Cam (focus ring, player panel, cards about
+  the chosen player), the analyst dashboard (pass networks, shot map, difficulty histogram,
+  clickable momentum timeline with the agent's explanation and evidence events), the
+  full-time recap (five languages, player of the match, copy as JSON) and the Director
+  panel (start, chaos switch, wrong-number injection, live agent trace and per-agent
+  latency).
+- Milestone: a live match in the browser with agent cards in sync. Checked with
+  screenshots in headless Chrome and a Playwright smoke test (2 tests) against the running
+  stack.
+- Fixes found by running it: card lifetimes scale with playback speed (D28), SQLite fsync
+  stalls (D29), viewers' cards share one stats snapshot, the recap page's polling loop,
+  and the histogram rendering.
+
+## Day 7 — Azure and hardening (worked Oct 20)
+
+**Done**
+- `Dockerfile` (one image: Python services plus the built site), `docker-compose.yml` for
+  local mode, `azure.yaml` and `infra/` (Bicep: Foundry with two model deployments,
+  Container Apps, Event Hubs, Cosmos DB, Web PubSub, Static Web Apps, App Insights, Key
+  Vault, managed identity with least-privilege roles, an optional budget alert). The Bicep
+  compiles and lints clean with Bicep 0.48.
+- Event Hubs bus and Cosmos DB store adapters; Web PubSub delivery; App Insights
+  exporter with managed identity plus Agent Framework instrumentation.
+- CI: lint, types, schema drift (Python and TypeScript), 319 tests, evals, web build,
+  Playwright against a live gateway, Docker build and smoke check, Bicep build and lint. A
+  manual deploy workflow uses azd with GitHub OIDC.
+- Hardening: three full 20× matches with three viewers ran clean (zero agent errors, zero
+  false rejections, recap written); tracking to browsers is thinned at fast replays; the
+  stats registry evicts old finished matches; real-world names are blocked by a hashed
+  deny-list scanned over every tracked file.
+
+**Broken / not done**
+- Not deployed: no Azure subscription or `az`/`azd` here, so the Bicep has never run
+  against Azure. Expect a round of fixes on the first `azd up` (for example model version
+  or region availability, and whether `FoundryChatClient` needs a different endpoint form
+  for your project).
+- The Docker image was not built on this machine (the disk is 99% full); CI builds it and
+  checks that local mode answers.
+- With the dev machine heavily loaded by other work, one run froze for several minutes
+  (swap and a load average near 40); nothing in the code was implicated, and runs at normal
+  load keep their speed.
+
+## Day 8 — ship: what is left for the owner
+
+1. **GitHub:** create the public repo and push (`gh repo create pitchside-ai --public
+   --source . --push`); CI runs on push.
+2. **Azure:** `azd auth login`, then `azd env set PITCHSIDE_BUDGET_EMAIL <you>` and `azd up`.
+   If the default models are not available in your region, set `MODEL_LARGE`,
+   `MODEL_SMALL` (and the versions in `infra/main.bicep`) or `PITCHSIDE_FOUNDRY_LOCATION`.
+   Then run three matches at 5× from the demo URL and check App Insights for traces
+   (screenshot for the README).
+3. **Evals on real models:** `FOUNDRY_ENDPOINT=... MODEL_LARGE=... MODEL_SMALL=... uv run
+   python -m evals.run`, and have a native speaker review
+   `evals/results/language_samples.md` (corrections go into
+   `services/agents/prompts/localizer.v2.md` as few-shot examples and into
+   `services/agents/i18n.py`).
+4. **Video:** record with `docs/VIDEO.md` (QuickTime or OBS on this Mac), upload to
+   YouTube, add the link to the README and the submission.
+5. **Submit:** paste `docs/SUBMISSION.md` into the hackathon site, choose Best
+   Multi-Agent System, and open the repo and demo URL in a private window before 8 pm Lagos
+   on Oct 27.

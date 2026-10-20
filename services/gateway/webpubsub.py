@@ -13,7 +13,7 @@ import logging
 from collections.abc import AsyncIterator
 from typing import Any
 
-from gateway.hub import Hub, envelope
+from gateway.hub import Hub, envelope, tracking_stride
 from runtime.bus import Bus, Message, Topic
 from runtime.config import Settings
 
@@ -64,7 +64,6 @@ class WebPubSubHub(Hub):
     def __init__(self, bus: Bus, settings: Settings) -> None:
         super().__init__(bus)
         self.settings = settings
-        self._frames: dict[str, int] = {}
 
     async def _send(self, group: str, text: str) -> None:
         try:
@@ -83,9 +82,9 @@ class WebPubSubHub(Hub):
         if kind is None:
             return
         if msg.topic == "tracking":
-            n = self._frames.get(msg.key, 0) + 1
-            self._frames[msg.key] = n
-            if n % TRACKING_EVERY:
+            n = self._frames[msg.key]  # counted by route() above
+            stride = max(TRACKING_EVERY, tracking_stride(self.cache[msg.key].match))
+            if n % stride:
                 return
         text = envelope(kind, msg.data)
         if msg.topic == "overlays":

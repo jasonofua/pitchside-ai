@@ -36,6 +36,14 @@ CLIENT_QUEUE = 2_000
 RECENT_OVERLAYS = 30
 RECENT_EVENTS = 40
 RECENT_TRACES = 60
+MAX_FRAMES_PER_S = 25  # tracking sent to browsers per second of wall time; the pitch interpolates
+
+
+def tracking_stride(match: dict[str, Any] | None) -> int:
+    """Forward every Nth tracking frame: all of them up to 5x, fewer at faster replays."""
+    speed = float((match or {}).get("speed") or 1.0)
+    return max(1, round(speed * 5 / MAX_FRAMES_PER_S))
+
 
 Send = Callable[[str], Awaitable[None]]
 
@@ -82,6 +90,7 @@ class Hub:
         self.clients: dict[str, set[Client]] = defaultdict(set)
         self.cache: dict[str, MatchCache] = defaultdict(MatchCache)
         self._announced: dict[str, tuple[str, ...]] = {}
+        self._frames: dict[str, int] = defaultdict(int)
 
     # --------------------------------------------------------------- clients
 
@@ -138,6 +147,9 @@ class Hub:
         data = msg.data
         if msg.topic == "tracking":
             cache.frame = data
+            self._frames[msg.key] += 1
+            if self._frames[msg.key] % tracking_stride(cache.match):
+                return
         elif msg.topic == "stats":
             cache.stats = data
         elif msg.topic == "matches":

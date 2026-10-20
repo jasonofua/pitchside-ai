@@ -115,3 +115,12 @@ def test_overlays_only_reach_their_profile(client: TestClient) -> None:
     assert (got_b["type"], got_b["data"]["title"]) == ("overlay", "for B")
     live = client.get(f"/api/matches/{mid}/live", params={"profile_hash": profile_hash(a)})
     assert [o["title"] for o in live.json()["overlays"]] == ["for A"]
+
+
+def test_tracking_is_thinned_for_fast_replays() -> None:
+    from gateway.hub import tracking_stride
+
+    assert tracking_stride(None) == 1
+    assert tracking_stride({"speed": 5}) == 1
+    assert tracking_stride({"speed": 20}) == 4
+    assert tracking_stride({"speed": 0}) == 1

@@ -210,3 +210,45 @@ Pidgin markers, function words); the native-speaker review of
 ### D25. Plain language for casual and kids viewers
 Casual and kids cards never lead with xG or other analyst terms: big chances use a plain
 "Big chance for <club>!" title and drop the xG stat; analysts keep the numbers.
+
+## Days 5-7 (worked Oct 20, 2026)
+
+### D26. The web app
+A Next.js static export (no server rendering), so it can sit on Static Web Apps or be
+served by the gateway; pages take the match from `?id=` instead of dynamic routes. In local
+mode and in the single-container image the gateway serves `web/out`, so the whole demo is
+one origin. Tracking frames go into a ref and the pitch interpolates between the last two
+on every animation frame (smooth at 60 fps from 5 Hz data); everything else is React state.
+The browser asks `/api/negotiate` where to connect: the gateway's own socket locally, Azure
+Web PubSub in Azure.
+
+### D27. Azure topology and scaling
+One image, five Container Apps (gateway, stats with the MCP server, agents, ingestor, sim),
+selected by `PITCHSIDE_ROLE`. **Deviation:** the spec mentions KEDA scaling on Event Hubs and
+scale to zero. Each worker keeps per-match state in memory (the Stats Engine, the agents'
+spell memory) and the gateway forwards every message to Web PubSub, so a second replica
+would split or duplicate work. Every app therefore runs exactly one replica. Scaling out
+would mean partitioned consumers with a checkpoint store and an external state store;
+that is not needed for a demo. Foundry (an AIServices account, a project and the two model
+deployments) is provisioned by the same Bicep. Model names and versions are parameters
+(default `gpt-4.1` and `gpt-4.1-mini`) because availability varies by region and over time.
+Static Web Apps hosts the site as the spec asks; the gateway also serves it, which gives a
+same-origin fallback URL.
+
+### D28. A card's ttl is reading time, stored in match time
+The overlay contract defines `ttl_ms` as how long a card stays valid after `clock_ms` in
+match time. A card meant to be read for 15 s at 5× is valid for 75 s of match clock, so
+`ttl_ms` = reading seconds × playback speed. The Producer's staleness check and the
+browser's display time both follow from that. Without this, at demo speeds the Producer
+dropped most explained cards as stale before they arrived.
+
+### D29. SQLite durability in local mode
+SQLite runs WAL with `synchronous=NORMAL`. Writes happen on the event loop, and a durable
+fsync per insert stalled live matches when the agents wrote bursts of trace documents.
+NORMAL never corrupts the database; a power cut can lose the last few writes, which local
+mode can afford.
+
+### D30. Optional features cut
+Per the spec's cut order, the audio recap (Azure AI Speech) and the A2A endpoint for the
+Fan Lens were not built. Everything the spec says never to cut (Three Fans, Fact Checker,
+Azure deployment templates) is in.

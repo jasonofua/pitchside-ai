@@ -37,6 +37,15 @@ param modelCapacity int = 50
 @allowed(['Free_F1', 'Standard_S1'])
 param webPubSubSku string = 'Standard_S1'
 
+@description('Email for the monthly budget alert (80% actual, 100% forecast). Empty skips the budget.')
+param budgetEmail string = ''
+
+@description('Monthly budget in the subscription currency.')
+param budgetAmount int = 150
+
+@description('First day of the month the budget starts (YYYY-MM-01).')
+param budgetStartDate string = '2026-10-01'
+
 var tags = { 'azd-env-name': environmentName, project: 'pitchside-ai' }
 
 resource rg 'Microsoft.Resources/resourceGroups@2024-03-01' = {
@@ -62,6 +71,9 @@ module resources 'resources.bicep' = {
     modelSmallVersion: modelSmallVersion
     modelCapacity: modelCapacity
     webPubSubSku: webPubSubSku
+    budgetEmail: budgetEmail
+    budgetAmount: budgetAmount
+    budgetStartDate: budgetStartDate
   }
 }
 

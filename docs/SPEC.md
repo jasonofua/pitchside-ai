@@ -217,29 +217,29 @@ The rule: a working end-to-end slice by Day 3, then widen. Day 8 is for the vide
 
 ### Day 5 — Sat Oct 24: the screen
 
-- [ ] Next.js match screen: 2D pitch from tracking, scoreboard, overlay rail, stat bug, momentum ribbon, player tags
-- [ ] Onboarding sheet for the personalization profile
-- [ ] **Milestone:** live match in the browser with agent cards appearing in sync
+- [x] Next.js match screen: 2D pitch from tracking, scoreboard, overlay rail, stat bug, momentum ribbon, player tags
+- [x] Onboarding sheet for the personalization profile
+- [x] **Milestone:** live match in the browser with agent cards appearing in sync
 
 ### Day 6 — Sun Oct 25: personalization and recap
 
-- [ ] Three Fans split view
-- [ ] Player Cam mode and focus-metric bug
-- [ ] Analyst dashboard and full-time Recap page with JSON export
-- [ ] Director panel with live agent trace
+- [x] Three Fans split view
+- [x] Player Cam mode and focus-metric bug
+- [x] Analyst dashboard and full-time Recap page with JSON export
+- [x] Director panel with live agent trace
 
 ### Day 7 — Mon Oct 26: Azure and hardening
 
-- [ ] Bicep + `azd up`: Container Apps, Event Hubs, Cosmos DB, Web PubSub, Static Web Apps, App Insights, Key Vault, managed identity
-- [ ] Deploy, run three full matches at 5x, fix what breaks
-- [ ] OpenTelemetry traces visible in App Insights (screenshot for README)
-- [ ] Public demo URL with a "Start demo match" button that needs no login
+- [ ] Bicep + `azd up`: Container Apps, Event Hubs, Cosmos DB, Web PubSub, Static Web Apps, App Insights, Key Vault, managed identity — written, compiles and lints; not yet deployed (needs the Azure account owner)
+- [ ] Deploy, run three full matches at 5x, fix what breaks — full matches run clean locally with three viewers; Azure run pending deployment
+- [ ] OpenTelemetry traces visible in App Insights (screenshot for README) — wired (Azure Monitor exporter + Agent Framework instrumentation); screenshot after deployment
+- [ ] Public demo URL with a "Start demo match" button that needs no login — the button and no-login flow are built; the URL comes with deployment
 
 ### Day 8 — Tue Oct 27: ship
 
-- [ ] Record and edit the 2-minute video; upload to YouTube (public or unlisted-but-accessible)
-- [ ] Final README: pitch, architecture image, Microsoft tech list, how to run, how to test, video link
-- [ ] Write the project description on the hackathon site and submit by 8 pm Lagos
+- [ ] Record and edit the 2-minute video; upload to YouTube (public or unlisted-but-accessible) — script and shot list in `docs/VIDEO.md`, raw-footage recorder in `web/scripts/record-demo.mjs`
+- [ ] Final README: pitch, architecture image, Microsoft tech list, how to run, how to test, video link — done except the demo and video links
+- [ ] Write the project description on the hackathon site and submit by 8 pm Lagos — text ready in `docs/SUBMISSION.md`
 - [ ] Open the repo and demo URL in a private browser window to confirm judges can reach both
 
 **If you fall behind, cut in this order:** audio recap → A2A → Analyst dashboard → Kids mode → one language. Never cut the Three Fans view, the Fact Checker, or the Azure deployment.
@@ -263,13 +263,13 @@ Use royalty-free music or none. Record at 1080p, large browser zoom.
 
 **Submission checklist:**
 
-- [ ] Public GitHub repo URL, MIT licence, clean README
-- [ ] Demo video under 2:00, public link
-- [ ] Live demo URL, no login (or credentials in testing notes), up until Nov 10
-- [ ] Elevator pitch naming Microsoft tech: Foundry, Agent Framework, MCP, Container Apps, Event Hubs, Cosmos DB, Web PubSub, App Insights, GitHub Copilot/Actions
-- [ ] Category selected: Best Multi-Agent System
-- [ ] No real club, league, or player names anywhere
-- [ ] Azure budget alert set so the demo isn't shut off by a billing surprise
+- [ ] Public GitHub repo URL, MIT licence, clean README — licence and README done; the repo still has to be created and pushed
+- [ ] Demo video under 2:00, public link — script in `docs/VIDEO.md`
+- [ ] Live demo URL, no login (or credentials in testing notes), up until Nov 10 — after `azd up`
+- [x] Elevator pitch naming Microsoft tech: Foundry, Agent Framework, MCP, Container Apps, Event Hubs, Cosmos DB, Web PubSub, App Insights, GitHub Copilot/Actions (`docs/SUBMISSION.md`)
+- [ ] Category selected: Best Multi-Agent System (on the submission form)
+- [x] No real club, league, or player names anywhere (`tests/test_no_real_names.py` scans every tracked file)
+- [ ] Azure budget alert set so the demo isn't shut off by a billing surprise — in the Bicep; set `PITCHSIDE_BUDGET_EMAIL` before `azd up`
 
 **Risks and fallbacks:**
 

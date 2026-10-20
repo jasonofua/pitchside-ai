@@ -13,6 +13,9 @@ param modelSmall string
 param modelSmallVersion string
 param modelCapacity int
 param webPubSubSku string
+param budgetEmail string
+param budgetAmount int
+param budgetStartDate string
 
 var token = toLower(uniqueString(subscription().id, resourceGroup().id, environmentName))
 var prefix = 'ps${take(token, 8)}'
@@ -333,6 +336,35 @@ resource foundryAIUserDev 'Microsoft.Authorization/roleAssignments@2022-04-01' =
   properties: {
     principalId: principalId
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roles.azureAIUser)
+  }
+}
+
+// ------------------------------------------------------------------------- budget
+
+// Keeps the public demo from being switched off by a billing surprise before judging ends.
+resource budget 'Microsoft.Consumption/budgets@2023-11-01' = if (!empty(budgetEmail)) {
+  name: 'budget-${prefix}'
+  properties: {
+    category: 'Cost'
+    amount: budgetAmount
+    timeGrain: 'Monthly'
+    timePeriod: { startDate: budgetStartDate }
+    notifications: {
+      actual80: {
+        enabled: true
+        operator: 'GreaterThan'
+        threshold: 80
+        thresholdType: 'Actual'
+        contactEmails: [budgetEmail]
+      }
+      forecast100: {
+        enabled: true
+        operator: 'GreaterThan'
+        threshold: 100
+        thresholdType: 'Forecasted'
+        contactEmails: [budgetEmail]
+      }
+    }
   }
 }
 

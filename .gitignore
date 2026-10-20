@@ -16,6 +16,7 @@ node_modules/
 web/out/
 web/test-results/
 web/playwright-report/
+web/recordings/
 *.tsbuildinfo
 
 # Local runtime data (SQLite event log)
