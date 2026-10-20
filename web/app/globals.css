@@ -1,0 +1,101 @@
+@import "tailwindcss";
+
+/* Dark broadcast theme with a single accent colour. Club colours come from the world file. */
+@theme {
+  --color-ink: #06080c;
+  --color-panel: #0d1218;
+  --color-panel-2: #131a23;
+  --color-line: #1f2a37;
+  --color-text: #e9eef5;
+  --color-muted: #8b98a9;
+  --color-accent: #d4ff3a;
+  --color-accent-ink: #11160a;
+  --color-danger: #ff5a5f;
+  --color-pitch: #0f3b26;
+  --color-pitch-2: #124530;
+  --font-sans: "Inter", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Barlow Condensed", "Arial Narrow", "Inter", system-ui, sans-serif;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  background: var(--color-ink);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+.display {
+  font-family: var(--font-display);
+  letter-spacing: 0.01em;
+}
+
+.glass {
+  background: color-mix(in oklab, var(--color-panel) 82%, transparent);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--color-line);
+}
+
+.chip {
+  border: 1px solid var(--color-line);
+  border-radius: 999px;
+  padding: 0.35rem 0.8rem;
+  font-size: 0.9rem;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.chip[aria-pressed="true"] {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-accent-ink);
+  font-weight: 600;
+}
+
+.btn {
+  border-radius: 0.6rem;
+  padding: 0.6rem 1.1rem;
+  font-weight: 600;
+  border: 1px solid var(--color-line);
+  transition: transform 0.1s, background 0.15s;
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn-accent {
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+  border-color: var(--color-accent);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
+.live-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 999px;
+  background: var(--color-danger);
+  animation: pulse-dot 1.4s ease-in-out infinite;
+}
