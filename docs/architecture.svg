@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 760" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#8b98a9"/>
+    </marker>
+    <style>
+      .t{fill:#e9eef5;font-size:15px;font-weight:600}
+      .s{fill:#8b98a9;font-size:12px}
+      .h{fill:#d4ff3a;font-size:13px;font-weight:700;letter-spacing:.08em}
+      .box{fill:#0d1218;stroke:#1f2a37;stroke-width:1.5;rx:12}
+      .agent{fill:#131a23;stroke:#2c3a4b;stroke-width:1.2;rx:10}
+      .acc{fill:#11160a;stroke:#d4ff3a;stroke-width:1.5;rx:12}
+      .ln{stroke:#8b98a9;stroke-width:1.6;fill:none;marker-end:url(#a)}
+    </style>
+  </defs>
+  <rect width="1280" height="760" fill="#06080c"/>
+  <text x="40" y="48" fill="#e9eef5" font-size="26" font-weight="800">Pitchside AI · architecture</text>
+  <text x="40" y="74" class="s">Numbers come only from deterministic code; language comes from agents; only fact-checked cards reach viewers.</text>
+
+  <!-- data tier -->
+  <text x="40" y="118" class="h">DATA TIER (deterministic)</text>
+  <rect x="40" y="132" width="250" height="78" class="box"/>
+  <text x="58" y="160" class="t">Synthetic match engine</text>
+  <text x="58" y="182" class="s">seeded Markov model · 5 Hz tracking</text>
+  <text x="58" y="198" class="s">scenario scripts · 1× 5× 20×</text>
+
+  <rect x="40" y="246" width="250" height="62" class="box"/>
+  <text x="58" y="273" class="t">Azure Event Hubs</text>
+  <text x="58" y="293" class="s">events · tracking · triggers · overlays</text>
+
+  <rect x="40" y="344" width="250" height="62" class="box"/>
+  <text x="58" y="371" class="t">Ingestor</text>
+  <text x="58" y="391" class="s">schema check · de-dup by event_id</text>
+
+  <rect x="40" y="442" width="250" height="62" class="box"/>
+  <text x="58" y="469" class="t">Azure Cosmos DB</text>
+  <text x="58" y="489" class="s">event log · matches · cards · traces</text>
+
+  <rect x="330" y="246" width="260" height="104" class="box"/>
+  <text x="348" y="273" class="t">Stats Engine</text>
+  <text x="348" y="294" class="s">possession · pass difficulty · xG · PPDA</text>
+  <text x="348" y="311" class="s">speed · distance · sprints</text>
+  <text x="348" y="328" class="s">Control vs Chaos index · triggers</text>
+
+  <rect x="330" y="386" width="260" height="118" class="acc"/>
+  <text x="348" y="413" class="t">Match Stats MCP server</text>
+  <text x="348" y="434" class="s">get_match_state · get_team_stats</text>
+  <text x="348" y="451" class="s">get_player_stats · get_events</text>
+  <text x="348" y="468" class="s">get_momentum · compare_periods</text>
+  <text x="348" y="490" fill="#d4ff3a" font-size="12">the one source of truth</text>
+
+  <path d="M165 210 V246" class="ln"/>
+  <path d="M165 308 V344" class="ln"/>
+  <path d="M165 406 V442" class="ln"/>
+  <path d="M290 277 H330" class="ln"/>
+  <path d="M460 350 V386" class="ln"/>
+
+  <!-- agents -->
+  <text x="630" y="118" class="h">AGENTS (Agent Framework · Foundry)</text>
+  <rect x="630" y="132" width="330" height="460" class="box"/>
+  <rect x="650" y="150" width="290" height="44" class="agent"/>
+  <text x="666" y="177" class="t">Moment Detector</text><text x="880" y="177" class="s">small</text>
+  <rect x="650" y="206" width="290" height="44" class="agent"/>
+  <text x="666" y="233" class="t">Tactical Analyst</text><text x="880" y="233" class="s">large</text>
+  <rect x="650" y="262" width="290" height="44" class="agent"/>
+  <text x="666" y="289" class="t">Narrator</text><text x="880" y="289" class="s">large</text>
+  <rect x="650" y="318" width="290" height="44" class="agent"/>
+  <text x="666" y="345" class="t">Fan Lens ×profiles</text><text x="880" y="345" class="s">small</text>
+  <rect x="650" y="374" width="290" height="44" class="agent"/>
+  <text x="666" y="401" class="t">Localizer</text><text x="840" y="401" class="s">en pcm yo fr es</text>
+  <rect x="650" y="430" width="290" height="44" class="agent"/>
+  <text x="666" y="457" class="t">Fact Checker</text><text x="850" y="457" class="s">small + code</text>
+  <rect x="650" y="486" width="290" height="44" class="agent"/>
+  <text x="666" y="513" class="t">Producer</text><text x="850" y="513" class="s">large + code</text>
+  <text x="650" y="562" class="s">typed messages · trace_id + moment_id on every hop</text>
+  <text x="650" y="580" class="s">4 s budget · template fallback · circuit breakers</text>
+  <path d="M795 194 V206 M795 250 V262 M795 306 V318 M795 362 V374 M795 418 V430 M795 474 V486" stroke="#8b98a9" stroke-width="1.6"/>
+  <path d="M590 445 C610 445 610 300 630 300" class="ln"/>
+  <path d="M590 300 C605 300 615 172 650 172" class="ln"/>
+  <text x="606" y="390" class="s" transform="rotate(-90 606 390)">MCP tools</text>
+
+  <!-- delivery -->
+  <text x="1000" y="118" class="h">DELIVERY</text>
+  <rect x="1000" y="132" width="240" height="78" class="box"/>
+  <text x="1018" y="160" class="t">Gateway (FastAPI)</text>
+  <text x="1018" y="182" class="s">REST · admin · Director API</text>
+  <text x="1018" y="198" class="s">per-profile routing</text>
+  <rect x="1000" y="246" width="240" height="62" class="box"/>
+  <text x="1018" y="273" class="t">Azure Web PubSub</text>
+  <text x="1018" y="293" class="s">groups per match / profile</text>
+  <rect x="1000" y="344" width="240" height="160" class="acc"/>
+  <text x="1018" y="371" class="t">Next.js on Static Web Apps</text>
+  <text x="1018" y="394" class="s">Match screen · 2D pitch</text>
+  <text x="1018" y="412" class="s">Three Fans split view</text>
+  <text x="1018" y="430" class="s">Analyst dashboard</text>
+  <text x="1018" y="448" class="s">Full-time recap · JSON</text>
+  <text x="1018" y="466" class="s">Director · chaos switch · trace</text>
+  <text x="1018" y="490" fill="#d4ff3a" font-size="12">overlay contract (JSON Schema)</text>
+  <path d="M940 508 C970 508 970 171 1000 171" class="ln"/>
+  <path d="M1120 210 V246" class="ln"/>
+  <path d="M1120 308 V344" class="ln"/>
+
+  <!-- platform -->
+  <rect x="40" y="630" width="1200" height="92" class="box"/>
+  <text x="60" y="660" class="h">PLATFORM</text>
+  <text x="60" y="688" class="t">Azure Container Apps</text><text x="60" y="708" class="s">one app per service · azd up · Bicep</text>
+  <text x="330" y="688" class="t">Application Insights</text><text x="330" y="708" class="s">OpenTelemetry traces across agents and MCP</text>
+  <text x="660" y="688" class="t">Managed identity · Key Vault</text><text x="660" y="708" class="s">no keys in code or config</text>
+  <text x="960" y="688" class="t">GitHub Actions</text><text x="960" y="708" class="s">lint · types · tests · evals · e2e · Bicep</text>
+</svg>
