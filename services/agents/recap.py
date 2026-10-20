@@ -138,6 +138,12 @@ async def build_recap(run: Run) -> dict[str, Any]:
     )
     for lang, (title, body) in zip(LANGS, results, strict=True):
         headlines[lang] = t("full_time", lang, **names)  # code template: always correct
+        if lang != "en" and body == english_story:
+            # The translation did not happen (offline models, or it failed its check): tell
+            # the story with the stats-only phrases in the viewer's language instead.
+            body = t("period_body", lang, home_poss=h["possession_pct"],
+                     away_poss=a["possession_pct"], home_shots=h["shots"],
+                     away_shots=a["shots"])  # fmt: skip
         stories[lang] = body
         del title
     doc = {

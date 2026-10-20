@@ -179,7 +179,7 @@ BODIES: dict[str, dict[Lang, str]] = {
 # English-only lines for the mock Tactical Analyst and Narrator (their output feeds the Fan
 # Lens and the recap, which are localised separately).
 HEADLINES = {
-    "goal": "{team} make their pressure count",
+    "goal": "{player} strikes for {team}",
     "big_chance": "{team} carve out a clear chance",
     "card": "Discipline costs {team}",
     "speed_burst": "{player} stretches the play",

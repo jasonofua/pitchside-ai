@@ -11,6 +11,12 @@ import type { Recap } from "@/lib/types";
 import { useMatchId } from "@/lib/useMatchId";
 import { useWorld } from "@/lib/world";
 
+function fmt(label: string, v: number | string | null): string {
+  if (v === null) return "—";
+  if (typeof v === "number" && label === "xG") return v.toFixed(2);
+  return String(v);
+}
+
 function RecapPage() {
   const id = useMatchId();
   const world = useWorld();
@@ -22,24 +28,30 @@ function RecapPage() {
   useEffect(() => {
     if (!id) return;
     let alive = true;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    // The recap is written at full time: poll until it exists, then stop.
     const load = () =>
       api
         .recap(id)
-        .then((r) => alive && (setRecap(r), setError(null)))
-        .catch((e: unknown) => alive && setError(e instanceof ApiError ? e.message : "Recap unavailable"));
+        .then((r) => {
+          if (!alive) return;
+          setRecap(r);
+          setError(null);
+        })
+        .catch((e: unknown) => {
+          if (!alive) return;
+          setError(e instanceof ApiError ? e.message : "Recap unavailable");
+          timer = setTimeout(load, 8000);
+        });
     void load();
-    const t = setInterval(() => !recap && load(), 8000);
     return () => {
       alive = false;
-      clearInterval(t);
+      if (timer) clearTimeout(timer);
     };
-  }, [id, recap]);
+  }, [id]);
 
   if (!id) return <main className="p-8 text-muted">No match selected. <Link className="text-accent" href="/">Start one</Link>.</main>;
   if (!recap) return <main className="p-8 text-muted">{error ?? "Loading…"}</main>;
-  const [home, away] = recap.final_score.split(" ");
-  void home;
-  void away;
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(JSON.stringify(recap, null, 2));
@@ -71,8 +83,8 @@ function RecapPage() {
           <div key={c.label} className="glass rounded-xl p-4">
             <div className="text-xs uppercase tracking-wider text-muted">{c.label}</div>
             <div className="display tnum mt-1 text-3xl font-bold">
-              {c.home ?? "—"}
-              {c.unit ?? ""} <span className="text-lg text-muted">–</span> {c.away ?? "—"}
+              {fmt(c.label, c.home)}
+              {c.unit ?? ""} <span className="text-lg text-muted">–</span> {fmt(c.label, c.away)}
               {c.unit ?? ""}
             </div>
           </div>

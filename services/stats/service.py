@@ -20,6 +20,7 @@ from stats.engine import StatsEngine
 log = logging.getLogger(__name__)
 
 SNAPSHOT_MIN_INTERVAL_S = 0.5
+MAX_ENGINES = 20  # finished matches beyond this are evicted (and rebuilt on demand)
 URGENT = frozenset({"goal", "card", "shot", "kickoff", "period_end", "substitution"})
 
 
@@ -39,9 +40,17 @@ class StatsRegistry:
         engine = self._engines.get(info.match_id)
         if engine is None:
             engine = self._engines[info.match_id] = StatsEngine(self.world, info)
+            self._evict()
         else:
             engine.info = info
         return engine
+
+    def _evict(self) -> None:
+        """Keep memory bounded on a long-running demo: drop the oldest finished matches.
+        A dropped match is rebuilt from the event log if anyone asks for it again."""
+        finished = [m for m, e in self._engines.items() if e.status in ("full_time", "aborted")]
+        while len(self._engines) > MAX_ENGINES and finished:
+            self._engines.pop(finished.pop(0), None)
 
     async def load(self, match_id: str) -> StatsEngine | None:
         """The engine for a match, replaying the stored event log if it is not in memory.

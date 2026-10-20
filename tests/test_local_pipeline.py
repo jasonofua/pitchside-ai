@@ -255,3 +255,16 @@ def test_cancelled_live_match_is_marked_aborted(world: World) -> None:
         return [m.data["status"] async for m in sub]
 
     assert run(main()) == ["live", "aborted"]
+
+
+def test_registry_evicts_old_finished_matches(world: World) -> None:
+    from stats.service import MAX_ENGINES
+
+    registry = StatsRegistry(world, SqliteStore())
+    for i in range(MAX_ENGINES + 5):
+        engine = registry.create(match_info(f"m{i}", "LAG", "HCF", i))
+        engine.status = "full_time"
+    live = registry.create(match_info("live", "LAG", "HCF", 99))
+    assert len(registry.match_ids()) <= MAX_ENGINES + 1
+    assert registry.get("live") is live
+    assert registry.get("m0") is None  # oldest finished match went first
