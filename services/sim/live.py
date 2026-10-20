@@ -60,6 +60,9 @@ async def run_live(
                 if n % YIELD_EVERY == 0:
                     await asyncio.sleep(0)
             await bus.publish(topic, match_id, item)
+            if isinstance(item, MatchEvent) and item.type == "kickoff" and status == "half_time":
+                status = "live"
+                await bus.publish("matches", match_id, info.model_copy(update={"status": status}))
             if isinstance(item, MatchEvent) and item.type == "period_end":
                 status = "half_time" if item.period == 1 else "full_time"
                 await bus.publish("matches", match_id, info.model_copy(update={"status": status}))

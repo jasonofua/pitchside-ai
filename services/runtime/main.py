@@ -15,6 +15,7 @@ import contextlib
 import logging
 import os
 from collections.abc import AsyncIterator
+from dataclasses import replace
 from typing import Any
 
 import uvicorn
@@ -24,6 +25,7 @@ from gateway.app import create_app
 from gateway.hub import Hub
 from gateway.readers import LocalStatsReader, RemoteStatsReader, StatsReader
 from ingestor import Ingestor
+from mcp_stats import build_server, http_app
 from runtime.bus import Bus, LocalBus
 from runtime.config import Settings
 from runtime.store import SqliteStore, Store
@@ -62,15 +64,20 @@ def make_store(settings: Settings) -> Store:
 
 
 def setup_telemetry(settings: Settings) -> None:
+    """Send OpenTelemetry traces (agent spans, model calls, MCP tool calls) to App Insights.
+
+    Local auth is disabled on the App Insights resource, so the exporter authenticates with
+    the app's managed identity."""
     if settings.appinsights_connection_string:
+        from agent_framework.observability import enable_instrumentation
+        from azure.identity import DefaultAzureCredential
         from azure.monitor.opentelemetry import configure_azure_monitor
 
         configure_azure_monitor(
             connection_string=settings.appinsights_connection_string,
+            credential=DefaultAzureCredential(),
             logger_name="pitchside",
         )
-        from agent_framework.observability import enable_instrumentation
-
         enable_instrumentation()
 
 
@@ -100,8 +107,6 @@ def build(role: str, settings: Settings | None = None) -> FastAPI:
     mcp = None
     extra_routes: list[Any] = []
     if registry is not None:
-        from mcp_stats import build_server, http_app
-
         mcp = build_server(registry)
         extra_routes = list(http_app(mcp).routes)
 
@@ -129,13 +134,22 @@ def build(role: str, settings: Settings | None = None) -> FastAPI:
                 from agents.crew import Crew
                 from agents.workflow import AgentService
 
-                crew = Crew(settings, bus, store)
+                crew_settings, http = settings, None
+                if mcp is not None and role == "all":
+                    # Same process as the MCP server: talk to it over an in-process ASGI
+                    # transport instead of looping back through the socket.
+                    import httpx
+
+                    http = httpx.AsyncClient(
+                        transport=httpx.ASGITransport(app=http_app(mcp)),
+                        base_url="http://pitchside.local",
+                        timeout=httpx.Timeout(10.0, read=30.0),
+                    )
+                    stack.push_async_callback(http.aclose)
+                    crew_settings = replace(settings, mcp_url="http://pitchside.local/mcp")
+                crew = Crew(crew_settings, bus, store, http_client=http)
                 agent_service = AgentService(crew)
-                tasks.append(asyncio.create_task(agent_service.run(), name="agents"))
-                # The crew connects to the MCP server, which this same process may be serving:
-                # connect once the server is accepting requests.
-                tasks.append(asyncio.create_task(_start_crew(crew), name="crew"))
-                stack.push_async_callback(crew.close)
+                tasks.append(asyncio.create_task(_run_crew(crew, agent_service), name="agents"))
             log.info("pitchside %s up (mode=%s, llm=%s)", role, settings.mode, settings.llm)
             try:
                 yield
@@ -160,17 +174,25 @@ def build(role: str, settings: Settings | None = None) -> FastAPI:
     )
 
 
-async def _start_crew(crew: Any) -> None:
-    for attempt in range(60):
-        try:
-            await crew.start()
-            log.info("agent crew ready (%d agents)", len(crew.agents))
+async def _run_crew(crew: Any, service: Any) -> None:
+    """Connect the crew (retrying until the MCP server answers), run it, close it, all in
+    one task: MCP client connections must be closed by the task that opened them."""
+    try:
+        for attempt in range(60):
+            try:
+                await crew.start()
+                break
+            except Exception as exc:
+                log.warning("agent crew not ready yet (%s); retrying", type(exc).__name__)
+                await crew.close()
+                await asyncio.sleep(min(5.0, 0.5 * (attempt + 1)))
+        else:
+            log.error("agent crew could not start")
             return
-        except Exception as exc:
-            log.warning("agent crew not ready yet (%s); retrying", type(exc).__name__)
-            await crew.close()
-            await asyncio.sleep(min(5.0, 0.5 * (attempt + 1)))
-    log.error("agent crew could not start")
+        log.info("agent crew ready (%d agents)", len(crew.agents))
+        await service.run()
+    finally:
+        await crew.close()
 
 
 def main() -> None:

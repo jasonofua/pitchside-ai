@@ -74,6 +74,10 @@ class SqliteStore:
             Path(path).parent.mkdir(parents=True, exist_ok=True)
         self._db = sqlite3.connect(str(path), check_same_thread=False, isolation_level=None)
         self._db.execute("PRAGMA journal_mode=WAL")
+        # Writes run on the event loop: without this every insert waits for an fsync, and a
+        # burst of trace documents stalls the live match. WAL + NORMAL never corrupts the
+        # database; a power cut can lose the last few writes, which local mode can afford.
+        self._db.execute("PRAGMA synchronous=NORMAL")
         self._db.executescript(SCHEMA)
         self._lock = threading.Lock()
         self._n = 0

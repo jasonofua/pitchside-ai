@@ -74,6 +74,7 @@ class Run:
     _ctx: dict[str, MomentContext] = field(default_factory=dict)
     _facts: Facts | None = None
     _facts_lock: asyncio.Lock = field(default_factory=asyncio.Lock)
+    _ctx_lock: asyncio.Lock = field(default_factory=asyncio.Lock)
     recorded: list[Any] = field(default_factory=list)  # MCP results the writers saw
     templated: set[str] = field(default_factory=set)  # profile hashes with a template card
     story: Story | None = None  # set by the Fan Lens, used to regenerate rejected cards
@@ -104,10 +105,20 @@ class Run:
             return None
 
     async def context(self, focus_player: str | None = None) -> MomentContext:
-        """Tool results for templates, fetched once per run (per focus player)."""
+        """Tool results for templates, fetched once per run (per focus player).
+
+        Locked: viewers' cards are built concurrently, and in a fast replay two separate
+        fetches would see different numbers, so the cards and the facts they are checked
+        against must share one snapshot."""
         key = focus_player or ""
         if key in self._ctx:
             return self._ctx[key]
+        async with self._ctx_lock:
+            if key in self._ctx:
+                return self._ctx[key]
+            return await self._fetch_context(key, focus_player)
+
+    async def _fetch_context(self, key: str, focus_player: str | None) -> MomentContext:
         base = self._ctx.get("")
         if base is None:
             pid = self.moment.player_id

@@ -76,14 +76,27 @@ def _results(messages: Sequence[Message]) -> Results:
 
 
 def _get(results: Results, tool: str, **match: Any) -> Any:
+    """The tool's result for these arguments; error text counts as no result."""
     for args, value in results.get(tool, []):
-        if all(args.get(k) == v for k, v in match.items()):
+        if all(args.get(k) == v for k, v in match.items()) and isinstance(value, dict | list):
             return value
     return None
 
 
+def _attempts(results: Results, tool: str, **match: Any) -> int:
+    return sum(
+        1 for args, _ in results.get(tool, []) if all(args.get(k) == v for k, v in match.items())
+    )
+
+
 def _need(results: Results, wanted: list[tuple[str, dict[str, Any]]]) -> ToolCalls:
-    return ToolCalls((tool, args) for tool, args in wanted if _get(results, tool, **args) is None)
+    """Tools still to call. A failed call is retried once; after that the brain writes with
+    what it has (as a model would after an error result)."""
+    return ToolCalls(
+        (tool, args)
+        for tool, args in wanted
+        if _get(results, tool, **args) is None and _attempts(results, tool, **args) < 2
+    )
 
 
 # ----------------------------------------------------------------------------- brains
@@ -123,7 +136,9 @@ def moment_detector(req: dict[str, Any], res: Results) -> ToolCalls | dict[str, 
     if need:
         return need
     kind = trig["kind"]
-    state = _get(res, "get_match_state", match_id=mid)
+    state = _get(res, "get_match_state", match_id=mid) or {
+        "home": {"score": 0}, "away": {"score": 0}, "cards": [],
+    }  # fmt: skip
     close = abs(state["home"]["score"] - state["away"]["score"]) <= 1
     if kind == "goal":
         return {"is_moment": True, "kind": "goal", "importance": 0.95, "summary": "A goal."}
