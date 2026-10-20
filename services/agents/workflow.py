@@ -71,6 +71,7 @@ class AgentService:
         self._sems: dict[str, asyncio.Semaphore] = {}
         self._tasks: set[asyncio.Task[Any]] = set()
         self.memory: dict[str, dict[str, tuple[int, int]]] = defaultdict(dict)
+        self._speeds: dict[str, float] = {}
         self.runs = 0
         self.skipped = 0
 
@@ -121,7 +122,7 @@ class AgentService:
             return []
         trace_id = f"t-{secrets.token_hex(6)}"
         run = Run(self.crew, trigger, trace_id, provisional_moment(trigger, trace_id), profiles,
-                  memory=self.memory[match_id])  # fmt: skip
+                  memory=self.memory[match_id], speed=await self._speed(match_id))  # fmt: skip
         sem = self._sems.setdefault(match_id, asyncio.Semaphore(MAX_RUNS_PER_MATCH))
         self._inflight[match_id] += 1
         try:
@@ -135,6 +136,12 @@ class AgentService:
             return cards
         finally:
             self._inflight[match_id] -= 1
+
+    async def _speed(self, match_id: str) -> float:
+        if match_id not in self._speeds:
+            info = await self.crew.store.get_match(match_id)
+            self._speeds[match_id] = info.speed if info is not None else 1.0
+        return self._speeds[match_id]
 
     def _spawn(self, trigger: Trigger) -> None:
         async def guarded() -> None:

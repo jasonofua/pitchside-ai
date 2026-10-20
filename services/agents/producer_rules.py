@@ -69,14 +69,21 @@ def overlay_id(card: CardDraft) -> str:
     return f"{card.moment_id}:{card.profile_hash}"
 
 
-def to_overlay(card: CardDraft, plan: ProducerPlan, clock_ms: int) -> OverlayCard:
+def match_ttl_ms(ttl_s: int, speed: float) -> int:
+    """A plan's ttl is reading time on screen; in match time that is ttl x playback speed."""
+    return int(ttl_s * 1000 * max(speed, 1.0))
+
+
+def to_overlay(
+    card: CardDraft, plan: ProducerPlan, clock_ms: int, speed: float = 1.0
+) -> OverlayCard:
     return OverlayCard(
         overlay_id=overlay_id(card),
         match_id=card.match_id,
         clock_ms=clock_ms,
         slot=plan.slot,
         priority=plan.priority,
-        ttl_ms=plan.ttl_s * 1000,
+        ttl_ms=match_ttl_ms(plan.ttl_s, speed),
         audience_profile_hash=card.profile_hash,
         lang=card.lang,
         title=card.title[:120],
@@ -94,8 +101,14 @@ def to_overlay(card: CardDraft, plan: ProducerPlan, clock_ms: int) -> OverlayCar
     )
 
 
-def is_stale(moment_clock_ms: int, now_clock_ms: int, ttl_s: int, same_period: bool) -> bool:
-    """A card is stale once the match clock has moved past its moment by more than its ttl."""
+def is_stale(
+    moment_clock_ms: int, now_clock_ms: int, ttl_s: int, same_period: bool, speed: float = 1.0
+) -> bool:
+    """A card is stale once the match clock has moved past its moment by more than its ttl
+    (in match time, so a faster replay allows proportionally more match time). Unpaced
+    replays (speed 0) never go stale."""
+    if speed == 0:
+        return False
     if not same_period:
         return True
-    return now_clock_ms - moment_clock_ms > ttl_s * 1000
+    return now_clock_ms - moment_clock_ms > match_ttl_ms(ttl_s, speed)

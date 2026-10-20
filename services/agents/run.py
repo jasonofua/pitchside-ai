@@ -78,6 +78,7 @@ class Run:
     templated: set[str] = field(default_factory=set)  # profile hashes with a template card
     story: Story | None = None  # set by the Fan Lens, used to regenerate rejected cards
     memory: dict[str, tuple[int, int]] = field(default_factory=dict)  # per match, shared
+    speed: float = 1.0  # the match's playback speed (0 = unpaced)
 
     @property
     def match_id(self) -> str:
@@ -164,7 +165,7 @@ class Run:
     async def publish(self, card: CardDraft, plan: ProducerPlan) -> OverlayCard:
         state = (await self.context()).match_state
         clock = state.get("clock_ms", self.trigger.clock_ms) if state else self.trigger.clock_ms
-        overlay = to_overlay(card, plan, clock)
+        overlay = to_overlay(card, plan, clock, self.speed)
         await self.crew.bus.publish("overlays", self.match_id, overlay)
         await self.crew.store.put_doc(
             "overlay", self.match_id, overlay.overlay_id, overlay.model_dump(mode="json")
@@ -176,8 +177,9 @@ class Run:
         if not state:
             return False
         return is_stale(
-            self.moment.clock_ms, state["clock_ms"], ttl_s, state["period"] == self.moment.period
-        )
+            self.moment.clock_ms, state["clock_ms"], ttl_s, state["period"] == self.moment.period,
+            self.speed,
+        )  # fmt: skip
 
     async def template_cards(self, only: set[str] | None = None) -> None:
         """Publish the stats-only card for each viewer (once per viewer per run)."""

@@ -224,6 +224,18 @@ def test_staleness() -> None:
     assert is_stale(60_000, 61_000, 12, False)
 
 
+def test_staleness_scales_with_playback_speed() -> None:
+    # 12 s on screen is a minute of match time at 5x: a card 30 s late is still fresh.
+    assert not is_stale(60_000, 90_000, 12, True, speed=5)
+    assert is_stale(60_000, 130_000, 12, True, speed=5)
+    assert not is_stale(60_000, 5_000_000, 12, False, speed=0)  # unpaced replays never expire
+
+
+def test_overlay_ttl_is_in_match_time() -> None:
+    card = to_overlay(_draft(), ProducerPlan(slot="lower_third", priority=3, ttl_s=10), 0, 5)
+    assert card.ttl_ms == 50_000
+
+
 # --------------------------------------------------------------- prompts, i18n
 
 
