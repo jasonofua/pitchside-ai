@@ -1,0 +1,76 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+# `azd up` provisions infra/ (Bicep) and deploys five Container Apps from one image plus
+# the static web app. Every Container App runs the same image with a different
+# PITCHSIDE_ROLE (set in infra/modules/app.bicep).
+name: pitchside-ai
+metadata:
+  template: pitchside-ai@0.1.0
+
+infra:
+  provider: bicep
+  path: infra
+
+services:
+  gateway:
+    project: .
+    language: python
+    host: containerapp
+    docker:
+      path: ./Dockerfile
+      context: .
+      remoteBuild: true
+  stats:
+    project: .
+    language: python
+    host: containerapp
+    docker:
+      path: ./Dockerfile
+      context: .
+      remoteBuild: true
+  agents:
+    project: .
+    language: python
+    host: containerapp
+    docker:
+      path: ./Dockerfile
+      context: .
+      remoteBuild: true
+  ingestor:
+    project: .
+    language: python
+    host: containerapp
+    docker:
+      path: ./Dockerfile
+      context: .
+      remoteBuild: true
+  sim:
+    project: .
+    language: python
+    host: containerapp
+    docker:
+      path: ./Dockerfile
+      context: .
+      remoteBuild: true
+  web:
+    project: ./web
+    language: js
+    host: staticwebapp
+    dist: out
+    hooks:
+      prepackage:
+        # The static site talks to the gateway's public URL (an output of the infra).
+        posix:
+          shell: sh
+          run: corepack enable && pnpm install --frozen-lockfile && NEXT_PUBLIC_API_URL="$GATEWAY_URL" pnpm build
+        windows:
+          shell: pwsh
+          run: corepack enable; pnpm install --frozen-lockfile; $env:NEXT_PUBLIC_API_URL=$env:GATEWAY_URL; pnpm build
+
+hooks:
+  postprovision:
+    posix:
+      shell: sh
+      run: |
+        echo "Gateway: $GATEWAY_URL"
+        echo "Web:     $WEB_URL"
+        echo "Foundry: $FOUNDRY_ENDPOINT ($MODEL_LARGE / $MODEL_SMALL)"

@@ -14,16 +14,102 @@ jobs:
         with:
           python-version: "3.12"
           enable-cache: true
-      - run: uv sync --frozen
+      - run: uv sync --frozen --all-extras
       - name: Lint
         run: uv run ruff check .
       - name: Format
         run: uv run ruff format --check .
       - name: Type-check
         run: uv run mypy
-      - name: Schema drift (models must match /schemas)
+      - name: Schema drift (Python models must match /schemas)
         run: |
           ./scripts/gen_models.sh
           git diff --exit-code -- services/contracts
       - name: Tests (includes the 50-run totals acceptance check)
         run: uv run pytest
+      - name: Agent evals (30 seeded moments, offline models)
+        run: uv run python -m evals.run --quiet --no-write
+
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - name: Schema drift (TypeScript types must match /schemas)
+        run: |
+          pnpm gen:types
+          git diff --exit-code -- lib/contracts.ts
+      - run: pnpm typecheck
+      - run: pnpm build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: web-out
+          path: web/out
+
+  e2e:
+    needs: [web]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: web-out
+          path: web/out
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+          enable-cache: true
+      - run: uv sync --frozen --all-extras
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
+      - name: Start Pitchside in local mode
+        run: |
+          PITCHSIDE_START_COOLDOWN_S=0 uv run python -m runtime.main --role all --port 8000 &
+          for i in $(seq 60); do curl -sf localhost:8000/api/health && break; sleep 1; done
+      - name: Playwright smoke test
+        working-directory: web
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm exec playwright install --with-deps chromium
+          CI=1 pnpm test:e2e
+
+  container:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the image
+        run: docker build -t pitchside-ai:ci .
+      - name: Local mode answers
+        run: |
+          docker run -d -p 8000:8000 --name ps pitchside-ai:ci
+          for i in $(seq 60); do curl -sf localhost:8000/api/health && break; sleep 1; done
+          curl -sf localhost:8000/ | grep -q "Pitchside"
+          docker logs ps | tail -20
+
+  infra:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bicep build and lint
+        run: |
+          curl -sLo bicep https://github.com/Azure/bicep/releases/latest/download/bicep-linux-x64
+          chmod +x bicep
+          ./bicep build infra/main.bicep --stdout > /dev/null
+          ./bicep lint infra/main.bicep

@@ -1,0 +1,25 @@
+# Local mode: every service in one container on the in-process bus, SQLite for the event
+# log, the Match Stats MCP server at /mcp and the web app at http://localhost:8000.
+# No Azure account and no model needed: the offline mock models run unless you set
+# OPENAI_COMPAT_BASE_URL (any OpenAI-compatible server) or FOUNDRY_ENDPOINT in .env.
+#
+#   docker compose up --build
+services:
+  pitchside:
+    build: .
+    image: pitchside-ai:local
+    ports:
+      - "8000:8000"
+    environment:
+      PITCHSIDE_MODE: local
+      PITCHSIDE_ROLE: all
+      PITCHSIDE_MCP_URL: http://127.0.0.1:8000/mcp
+    env_file:
+      - path: .env
+        required: false
+    volumes:
+      - pitchside-data:/data
+    restart: unless-stopped
+
+volumes:
+  pitchside-data: {}

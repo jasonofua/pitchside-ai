@@ -1,0 +1,15 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "environmentName": { "value": "${AZURE_ENV_NAME}" },
+    "location": { "value": "${AZURE_LOCATION}" },
+    "principalId": { "value": "${AZURE_PRINCIPAL_ID}" },
+    "deployFoundry": { "value": "${PITCHSIDE_DEPLOY_FOUNDRY=true}" },
+    "foundryEndpoint": { "value": "${FOUNDRY_ENDPOINT=}" },
+    "foundryLocation": { "value": "${PITCHSIDE_FOUNDRY_LOCATION=${AZURE_LOCATION}}" },
+    "modelLarge": { "value": "${MODEL_LARGE=gpt-4.1}" },
+    "modelSmall": { "value": "${MODEL_SMALL=gpt-4.1-mini}" },
+    "webPubSubSku": { "value": "${PITCHSIDE_WEBPUBSUB_SKU=Standard_S1}" }
+  }
+}
