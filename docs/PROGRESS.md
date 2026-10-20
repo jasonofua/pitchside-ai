@@ -94,3 +94,23 @@ pushing overlay JSON; one match explained end to end in a terminal.
 
 **Next (Day 4)**: evals for every agent (30 seeded moments, number accuracy and language
 quality), then the native-speaker review list for Pidgin and Yoruba.
+
+## Day 4 — the rest of the crew (worked Oct 20)
+
+**Done**
+- Fan Lens, Localizer, Fact Checker and Producer, and the failure handling, were built
+  on Day 3; today added the evals that hold them to account.
+- `uv run python -m evals.run` replays 30 seeded moments through the crew for five viewers
+  and scores every agent. With the offline models all seven pass (results in
+  `evals/results/mock.md`); the run caught and fixed xG jargon in casual and kids cards and
+  Pidgin lines that read as English.
+- `evals/results/language_samples.md`: 20 Pidgin and 20 Yoruba cards ready for review.
+
+**Broken / not done**
+- The evals have only run against the offline models. With Foundry deployments in place,
+  run `FOUNDRY_ENDPOINT=... MODEL_LARGE=... MODEL_SMALL=... uv run python -m evals.run`.
+- Native-speaker review of the Pidgin and Yoruba samples (owner action).
+
+**Next (Day 5)**: the match screen in the browser (pitch, scoreboard, overlay rail, stat
+bug, momentum ribbon, player tags), the onboarding sheet, and the live match with agent
+cards in sync.

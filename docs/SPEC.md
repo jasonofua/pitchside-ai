@@ -211,9 +211,9 @@ The rule: a working end-to-end slice by Day 3, then widen. Day 8 is for the vide
 
 ### Day 4 — Fri Oct 23: the rest of the crew
 
-- [ ] Fan Lens (4 modes), Localizer (en, pcm, yo, fr, es), Fact Checker, Producer
-- [ ] Failure handling: timeouts, template fallback, circuit breaker, chaos switch
-- [ ] Evals: 30 seeded moments checked for number accuracy and language quality (have a native speaker check Pidgin and Yoruba samples)
+- [x] Fan Lens (4 modes), Localizer (en, pcm, yo, fr, es), Fact Checker, Producer
+- [x] Failure handling: timeouts, template fallback, circuit breaker, chaos switch
+- [x] Evals: 30 seeded moments checked for number accuracy and language quality — native-speaker review of `evals/results/language_samples.md` still needed (owner)
 
 ### Day 5 — Sat Oct 24: the screen
 
