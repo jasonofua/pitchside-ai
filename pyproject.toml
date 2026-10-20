@@ -59,7 +59,7 @@ constraint-dependencies = ["cryptography<49"]
 [tool.ruff]
 line-length = 100
 target-version = "py312"
-src = ["services", "tests", "scripts"]
+src = ["services", "tests", "scripts", "evals"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "UP", "B", "SIM", "RUF", "N"]
@@ -71,13 +71,13 @@ select = ["E", "F", "W", "I", "UP", "B", "SIM", "RUF", "N"]
 "services/agents/mock_phrases.py" = ["E501", "RUF001"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["sim", "contracts", "stats", "runtime", "ingestor", "mcp_stats", "agents", "gateway"]
+known-first-party = ["sim", "contracts", "stats", "runtime", "ingestor", "mcp_stats", "agents", "gateway", "evals"]
 
 [tool.mypy]
 python_version = "3.12"
 strict = true
-mypy_path = "services"
-packages = ["sim", "contracts", "stats", "runtime", "ingestor", "mcp_stats", "agents", "gateway"]
+mypy_path = "services:."
+packages = ["sim", "contracts", "stats", "runtime", "ingestor", "mcp_stats", "agents", "gateway", "evals"]
 plugins = ["pydantic.mypy"]
 
 [tool.pytest.ini_options]

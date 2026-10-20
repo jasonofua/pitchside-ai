@@ -1,0 +1,92 @@
+{
+  "run_at": "2026-10-20T00:02:07+00:00",
+  "scores": [
+    {
+      "agent": "moment_detector",
+      "metrics": {
+        "kind_accuracy": 1.0,
+        "p50_ms": 66,
+        "p95_ms": 118
+      },
+      "failures": [],
+      "passed": true
+    },
+    {
+      "agent": "tactical_analyst",
+      "metrics": {
+        "coverage": 1.0,
+        "number_accuracy": 1.0,
+        "citations_backed": 1.0,
+        "p50_ms": 214,
+        "p95_ms": 266
+      },
+      "failures": [],
+      "passed": true
+    },
+    {
+      "agent": "narrator",
+      "metrics": {
+        "coverage": 1.0,
+        "number_accuracy": 1.0,
+        "p50_ms": 159,
+        "p95_ms": 176
+      },
+      "failures": [],
+      "passed": true
+    },
+    {
+      "agent": "fan_lens",
+      "metrics": {
+        "agent_cards": 125,
+        "mode_rules": 1.0,
+        "player_cam_focus": 1.0,
+        "first_draft_accuracy": 1.0,
+        "p50_ms": 873,
+        "p95_ms": 1167
+      },
+      "failures": [],
+      "passed": true
+    },
+    {
+      "agent": "localizer",
+      "metrics": {
+        "lang_en": 1.0,
+        "lang_es": 1.0,
+        "lang_fr": 1.0,
+        "lang_pcm": 1.0,
+        "lang_yo": 1.0,
+        "figures_intact": 1.0,
+        "p50_ms": 0,
+        "p95_ms": 4
+      },
+      "failures": [],
+      "passed": true
+    },
+    {
+      "agent": "fact_checker",
+      "metrics": {
+        "recall_on_injected_errors": 1.0,
+        "injected": 46,
+        "clean_pass_rate": 1.0,
+        "verdicts": "ok=125",
+        "p50_ms": 3,
+        "p95_ms": 227
+      },
+      "failures": [],
+      "passed": true
+    },
+    {
+      "agent": "producer",
+      "metrics": {
+        "contract_valid": 1.0,
+        "upgrades_in_place": 1.0,
+        "stat_overlay_under_1s": 1.0,
+        "overlays": 265,
+        "p50_ms": 59,
+        "p95_ms": 365
+      },
+      "failures": [],
+      "passed": true
+    }
+  ]
+}

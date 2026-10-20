@@ -64,6 +64,10 @@ class StatsRegistry:
                 engine.on_event(event)
             return engine
 
+    def put(self, engine: StatsEngine) -> None:
+        """Register an engine built elsewhere (evals replay matches up to a moment)."""
+        self._engines[engine.match_id] = engine
+
     def match_ids(self) -> list[str]:
         return list(self._engines)
 
