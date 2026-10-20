@@ -30,7 +30,7 @@ PHRASES: dict[str, dict[Lang, str]] = {
     },
     "yellow": {
         "en": "Yellow card: {player}",
-        "pcm": "Yellow card for {player}",
+        "pcm": "Referee don book {player}",
         "yo": "Káàdì ofeefee fún {player}",
         "fr": "Carton jaune : {player}",
         "es": "Tarjeta amarilla: {player}",
@@ -51,7 +51,7 @@ PHRASES: dict[str, dict[Lang, str]] = {
     },
     "card_body": {
         "en": "{team}, {minute}",
-        "pcm": "{team}, {minute}",
+        "pcm": "{team} don collect am for {minute}",
         "yo": "{team}, ìṣẹ́jú {minute}",
         "fr": "{team}, {minute}",
         "es": "{team}, {minute}",
@@ -65,17 +65,24 @@ PHRASES: dict[str, dict[Lang, str]] = {
     },
     "speed_body": {
         "en": "Sprinting above 32 km/h",
-        "pcm": "E pass 32 km/h for this run",
+        "pcm": "E don pass 32 km/h for this run",
         "yo": "Ó sáré ju 32 km/h lọ",
         "fr": "Sprint au-delà de 32 km/h",
         "es": "Sprint por encima de 32 km/h",
     },
     "xg": {
         "en": "Big chance: {value} xG",
-        "pcm": "Big chance: {value} xG",
+        "pcm": "Chance wey big: {value} xG",
         "yo": "Àǹfààní ńlá: {value} xG",
         "fr": "Grosse occasion : {value} xG",
         "es": "Ocasión clara: {value} xG",
+    },
+    "chance_plain": {
+        "en": "Big chance for {team}!",
+        "pcm": "Chance wey big for {team}!",
+        "yo": "Àǹfààní ńlá fún {team}!",
+        "fr": "Grosse occasion pour {team} !",
+        "es": "¡Ocasión clara para {team}!",
     },
     "xg_body": {
         "en": "{player} ({team}), {outcome}",
@@ -86,14 +93,14 @@ PHRASES: dict[str, dict[Lang, str]] = {
     },
     "pass_difficulty": {
         "en": "Pass difficulty {value}/100",
-        "pcm": "Correct pass! Difficulty {value}/100",
+        "pcm": "Na correct pass! Difficulty {value}/100",
         "yo": "Ìfiránṣẹ́ tó le: {value}/100",
         "fr": "Passe de difficulté {value}/100",
         "es": "Pase de dificultad {value}/100",
     },
     "pass_difficulty_body": {
         "en": "{player} finds a team-mate through traffic",
-        "pcm": "{player} find im paddy for inside crowd",
+        "pcm": "{player} don find im paddy for inside crowd",
         "yo": "{player} rí ẹlẹgbẹ́ rẹ̀ láàrin àwọn alátakò",
         "fr": "{player} trouve un partenaire dans la densité",
         "es": "{player} encuentra a un compañero entre líneas",
@@ -121,21 +128,21 @@ PHRASES: dict[str, dict[Lang, str]] = {
     },
     "half_time": {
         "en": "Half time: {home} {score} {away}",
-        "pcm": "Half time: {home} {score} {away}",
+        "pcm": "Na half time: {home} {score} {away}",
         "yo": "Ìdajì àkókò: {home} {score} {away}",
         "fr": "Mi-temps : {home} {score} {away}",
         "es": "Descanso: {home} {score} {away}",
     },
     "full_time": {
         "en": "Full time: {home} {score} {away}",
-        "pcm": "Full time: {home} {score} {away}",
+        "pcm": "Na full time: {home} {score} {away}",
         "yo": "Òpin ìdíje: {home} {score} {away}",
         "fr": "Fin du match : {home} {score} {away}",
         "es": "Final: {home} {score} {away}",
     },
     "period_body": {
         "en": "Possession {home_poss}% to {away_poss}%, shots {home_shots} to {away_shots}",
-        "pcm": "Ball possession {home_poss}% to {away_poss}%, shots {home_shots} to {away_shots}",
+        "pcm": "Ball possession {home_poss}% to {away_poss}%, dem shoot {home_shots} to {away_shots} times",
         "yo": "Ìní bọ́ọ̀lù {home_poss}% sí {away_poss}%, ìgbá {home_shots} sí {away_shots}",
         "fr": "Possession {home_poss} % à {away_poss} %, tirs {home_shots} à {away_shots}",
         "es": "Posesión {home_poss}% a {away_poss}%, tiros {home_shots} a {away_shots}",
@@ -157,7 +164,7 @@ PHRASES: dict[str, dict[Lang, str]] = {
     # -------------------------------------------------------------- outcomes
     "outcome_complete": {
         "en": "scored",
-        "pcm": "e enter",
+        "pcm": "e don enter",
         "yo": "ó wọlé",
         "fr": "but",
         "es": "gol",

@@ -33,7 +33,7 @@ BODIES: dict[str, dict[Lang, str]] = {
     },
     "analyst_chance": {
         "en": "A {shot_xg} xG chance for {team}, who have {xg} xG from {shots} shots.",
-        "pcm": "Chance of {shot_xg} xG for {team}; dem get {xg} xG from {shots} shots.",
+        "pcm": "Chance wey get {shot_xg} xG for {team}; dem don get {xg} xG from {shots} shots.",
         "yo": "Àǹfààní {shot_xg} xG fún {team}; wọ́n ní {xg} xG láti inú ìgbá {shots}.",
         "fr": "Occasion à {shot_xg} xG pour {team}, qui totalise {xg} xG sur {shots} tirs.",
         "es": "Ocasión de {shot_xg} xG para {team}, que suma {xg} xG en {shots} tiros.",
@@ -61,7 +61,7 @@ BODIES: dict[str, dict[Lang, str]] = {
     },
     "analyst_period": {
         "en": "xG {home_xg} to {away_xg}; pass accuracy {home_acc}% to {away_acc}%.",
-        "pcm": "xG {home_xg} to {away_xg}; pass wey land {home_acc}% to {away_acc}%.",
+        "pcm": "xG na {home_xg} to {away_xg}; pass wey land {home_acc}% to {away_acc}%.",
         "yo": "xG {home_xg} sí {away_xg}; ìpéye ìfiránṣẹ́ {home_acc}% sí {away_acc}%.",
         "fr": "xG {home_xg} à {away_xg} ; passes réussies {home_acc} % à {away_acc} %.",
         "es": "xG {home_xg} a {away_xg}; precisión de pase {home_acc}% a {away_acc}%.",

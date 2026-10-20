@@ -124,13 +124,18 @@ def render(moment: Moment, profile: Profile, ctx: MomentContext) -> tuple[str, s
         ev = ctx.event or {}
         xg_value = _trigger_value(ctx)
         outcome = t(f"outcome_{ev.get('outcome', 'saved')}", lang)
-        title = t("xg", lang, value=xg_value)
+        plain = profile.mode in ("casual", "kids")
+        title = (
+            t("chance_plain", lang, team=ctx.team(moment.team_id)["name"])
+            if plain
+            else t("xg", lang, value=xg_value)
+        )
         body = t("xg_body", lang, player=_player_name(ctx),
                  team=ctx.team(moment.team_id)["short_name"], outcome=outcome)  # fmt: skip
         if ev.get("ball_speed_kmh") is not None:
             stats.append(_stat("label_shot_speed", lang, ev["ball_speed_kmh"], "km/h"))
         h, a = ctx.teams_stats(ctx.team_stats)
-        if h:
+        if h and not plain:
             stats.append(_stat("label_xg", lang, f"{h['xg']} - {a['xg']}"))
     elif kind == "hard_pass":
         value = _trigger_value(ctx)

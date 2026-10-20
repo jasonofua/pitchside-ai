@@ -314,6 +314,8 @@ def fan_lens(req: dict[str, Any], res: Results) -> ToolCalls | dict[str, Any]:
         card = next((c for c in state.get("cards", []) if c["event_id"] in ids), None)
         color = card["card_color"] if card else "yellow"
         title = _render(color, "en", {"player": card["player_name"] if card else ""}, PHRASES)
+    elif kind == "big_chance" and mode in ("casual", "kids"):
+        title = _render("chance_plain", "en", v, PHRASES)  # no xG for these viewers
     else:
         title_key = TITLE_KEY[kind]
         title = _render(title_key, "en", v, PHRASES)
