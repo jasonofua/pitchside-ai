@@ -29,6 +29,9 @@ COPY schemas ./schemas
 COPY data/world.json ./data/world.json
 COPY data/crests ./data/crests
 COPY services ./services
+# COPY keeps the build context's file modes; make the app readable by the non-root user
+# whatever they were on the machine that ran the build (azd's remote build uploads them as is).
+RUN chmod -R a+rX schemas data services
 RUN uv sync --frozen --no-dev --all-extras
 COPY --from=web /web/out ./web/out
 RUN useradd --create-home --uid 10001 pitchside && mkdir -p /data && chown pitchside /data
