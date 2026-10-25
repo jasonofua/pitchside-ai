@@ -19,8 +19,8 @@ param deployFoundry bool = true
 @description('Existing Foundry project endpoint, used when deployFoundry is false.')
 param foundryEndpoint string = ''
 
-@description('Region for Foundry (model availability varies by region).')
-param foundryLocation string = location
+@description('Region for Foundry (model availability varies by region). Empty: the primary region.')
+param foundryLocation string = ''
 
 @description('Large model: analysis and narration.')
 param modelLarge string = 'gpt-4.1'
@@ -46,6 +46,9 @@ param budgetAmount int = 150
 @description('First day of the month the budget starts (YYYY-MM-01).')
 param budgetStartDate string = '2026-10-01'
 
+@description('Images azd last deployed, by service (azd sets SERVICE_<NAME>_IMAGE_NAME after a deploy).')
+param serviceImages object = {}
+
 var tags = { 'azd-env-name': environmentName, project: 'pitchside-ai' }
 
 resource rg 'Microsoft.Resources/resourceGroups@2024-03-01' = {
@@ -64,7 +67,7 @@ module resources 'resources.bicep' = {
     principalId: principalId
     deployFoundry: deployFoundry
     foundryEndpoint: foundryEndpoint
-    foundryLocation: foundryLocation
+    foundryLocation: empty(foundryLocation) ? location : foundryLocation
     modelLarge: modelLarge
     modelLargeVersion: modelLargeVersion
     modelSmall: modelSmall
@@ -74,6 +77,7 @@ module resources 'resources.bicep' = {
     budgetEmail: budgetEmail
     budgetAmount: budgetAmount
     budgetStartDate: budgetStartDate
+    serviceImages: serviceImages
   }
 }
 

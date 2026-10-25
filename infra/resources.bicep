@@ -16,6 +16,8 @@ param webPubSubSku string
 param budgetEmail string
 param budgetAmount int
 param budgetStartDate string
+@description('Images azd last deployed, by service name (empty before the first deploy).')
+param serviceImages object
 
 var token = toLower(uniqueString(subscription().id, resourceGroup().id, environmentName))
 var prefix = 'ps${take(token, 8)}'
@@ -432,8 +434,10 @@ module gateway 'modules/app.bicep' = {
     secrets: [
       { name: 'ingest-token', keyVaultUrl: ingestToken.properties.secretUri, identity: identity.id }
     ]
+    imageName: serviceImages.?gateway ?? ''
   }
-  dependsOn: [acrPull, vaultSecrets]
+  // Start after the data-plane grants exist (they can still take minutes to apply).
+  dependsOn: [acrPull, vaultSecrets, eventHubsData, webPubSubData, telemetryPublisher, cosmosDataApps, foundryOpenAIUser, foundryAIUser]
 }
 
 module stats 'modules/app.bicep' = {
@@ -449,8 +453,9 @@ module stats 'modules/app.bicep' = {
     registryServer: registry.properties.loginServer
     ingress: 'internal'
     env: commonEnv
+    imageName: serviceImages.?stats ?? ''
   }
-  dependsOn: [acrPull]
+  dependsOn: [acrPull, eventHubsData, webPubSubData, telemetryPublisher, cosmosDataApps, foundryOpenAIUser, foundryAIUser]
 }
 
 module workers 'modules/app.bicep' = [for role in ['sim', 'ingestor', 'agents']: {
@@ -466,8 +471,9 @@ module workers 'modules/app.bicep' = [for role in ['sim', 'ingestor', 'agents']:
     registryServer: registry.properties.loginServer
     ingress: 'none'
     env: commonEnv
+    imageName: serviceImages[?role] ?? ''
   }
-  dependsOn: [acrPull]
+  dependsOn: [acrPull, eventHubsData, webPubSubData, telemetryPublisher, cosmosDataApps, foundryOpenAIUser, foundryAIUser]
 }]
 
 output registryEndpoint string = registry.properties.loginServer

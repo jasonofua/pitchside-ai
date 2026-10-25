@@ -7,10 +7,19 @@
     "principalId": { "value": "${AZURE_PRINCIPAL_ID}" },
     "deployFoundry": { "value": "${PITCHSIDE_DEPLOY_FOUNDRY=true}" },
     "foundryEndpoint": { "value": "${FOUNDRY_ENDPOINT=}" },
-    "foundryLocation": { "value": "${PITCHSIDE_FOUNDRY_LOCATION=${AZURE_LOCATION}}" },
+    "foundryLocation": { "value": "${PITCHSIDE_FOUNDRY_LOCATION=}" },
     "modelLarge": { "value": "${MODEL_LARGE=gpt-4.1}" },
     "modelSmall": { "value": "${MODEL_SMALL=gpt-4.1-mini}" },
     "webPubSubSku": { "value": "${PITCHSIDE_WEBPUBSUB_SKU=Standard_S1}" },
-    "budgetEmail": { "value": "${PITCHSIDE_BUDGET_EMAIL=}" }
+    "budgetEmail": { "value": "${PITCHSIDE_BUDGET_EMAIL=}" },
+    "serviceImages": {
+      "value": {
+        "gateway": "${SERVICE_GATEWAY_IMAGE_NAME=}",
+        "stats": "${SERVICE_STATS_IMAGE_NAME=}",
+        "sim": "${SERVICE_SIM_IMAGE_NAME=}",
+        "ingestor": "${SERVICE_INGESTOR_IMAGE_NAME=}",
+        "agents": "${SERVICE_AGENTS_IMAGE_NAME=}"
+      }
+    }
   }
 }
