@@ -188,6 +188,11 @@ cards in sync.
   - App Insights got only the `pitchside` logger; it now gets every module's logs, with
     Azure SDK request logging kept at WARNING. The Foundry clients share one credential.
   - `PITCHSIDE_FOUNDRY_LOCATION` used a nested default that azd may not expand.
+- Default models moved from `gpt-4.1` / `gpt-4.1-mini` (Deprecated in Foundry: new
+  subscriptions cannot deploy them) to `gpt-5.4` / `gpt-5.4-mini`. These are reasoning
+  models, so agents send a low reasoning effort instead of a temperature (D32). Model
+  capacity is now an azd setting (`PITCHSIDE_MODEL_CAPACITY`, thousands of tokens per
+  minute; lower it if the deploy reports insufficient quota).
 - Public repo: https://github.com/jasonofua/pitchside-ai.
 
 **Broken / not done**

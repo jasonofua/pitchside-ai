@@ -23,12 +23,12 @@ param foundryEndpoint string = ''
 param foundryLocation string = ''
 
 @description('Large model: analysis and narration.')
-param modelLarge string = 'gpt-4.1'
-param modelLargeVersion string = '2025-04-14'
+param modelLarge string = 'gpt-5.4'
+param modelLargeVersion string = '2026-03-05'
 
 @description('Small model: moment triage, rewrites, translation, checks.')
-param modelSmall string = 'gpt-4.1-mini'
-param modelSmallVersion string = '2025-04-14'
+param modelSmall string = 'gpt-5.4-mini'
+param modelSmallVersion string = '2026-03-17'
 
 @description('Tokens-per-minute capacity (thousands) for each model deployment.')
 param modelCapacity int = 50

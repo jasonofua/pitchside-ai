@@ -8,8 +8,9 @@
     "deployFoundry": { "value": "${PITCHSIDE_DEPLOY_FOUNDRY=true}" },
     "foundryEndpoint": { "value": "${FOUNDRY_ENDPOINT=}" },
     "foundryLocation": { "value": "${PITCHSIDE_FOUNDRY_LOCATION=}" },
-    "modelLarge": { "value": "${MODEL_LARGE=gpt-4.1}" },
-    "modelSmall": { "value": "${MODEL_SMALL=gpt-4.1-mini}" },
+    "modelLarge": { "value": "${MODEL_LARGE=gpt-5.4}" },
+    "modelSmall": { "value": "${MODEL_SMALL=gpt-5.4-mini}" },
+    "modelCapacity": { "value": "${PITCHSIDE_MODEL_CAPACITY=50}" },
     "webPubSubSku": { "value": "${PITCHSIDE_WEBPUBSUB_SKU=Standard_S1}" },
     "budgetEmail": { "value": "${PITCHSIDE_BUDGET_EMAIL=}" },
     "serviceImages": {

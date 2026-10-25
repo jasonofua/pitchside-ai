@@ -337,3 +337,24 @@ def test_render_never_leaves_placeholders() -> None:
             title, body, _ = render(moment, Profile(mode="analyst", language=lang),
                                     _context(stats, trig))  # fmt: skip
             assert "{" not in title + body
+
+
+def test_model_options_match_what_each_model_accepts() -> None:
+    from dataclasses import replace
+
+    from agents.crew import is_reasoning_model, model_options
+    from runtime.config import Settings
+
+    assert is_reasoning_model("gpt-5.4") and is_reasoning_model("gpt-5.4-mini")
+    assert is_reasoning_model("o4-mini")
+    assert not is_reasoning_model("gpt-4.1") and not is_reasoning_model("gpt-5-chat")
+    assert not is_reasoning_model("llama3.1")
+
+    base = replace(Settings.from_env(), reasoning_effort="low")
+    foundry, compat = replace(base, llm="foundry"), replace(base, llm="openai")
+    # Reasoning models reject temperature; Foundry (Responses API) takes an effort level.
+    assert model_options(foundry, "gpt-5.4-mini") == {"reasoning": {"effort": "low"}}
+    assert model_options(compat, "gpt-5.4-mini") is None
+    assert model_options(foundry, "gpt-4.1") == {"temperature": 0.4}
+    assert model_options(compat, "llama3.1") == {"temperature": 0.4}
+    assert model_options(replace(base, llm="mock"), "mock-large") is None

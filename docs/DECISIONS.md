@@ -231,7 +231,7 @@ would split or duplicate work. Every app therefore runs exactly one replica. Sca
 would mean partitioned consumers with a checkpoint store and an external state store;
 that is not needed for a demo. Foundry (an AIServices account, a project and the two model
 deployments) is provisioned by the same Bicep. Model names and versions are parameters
-(default `gpt-4.1` and `gpt-4.1-mini`) because availability varies by region and over time.
+(default `gpt-5.4` and `gpt-5.4-mini`, see D32) because availability varies by region and over time.
 Static Web Apps hosts the site as the spec asks; the gateway also serves it, which gives a
 same-origin fallback URL.
 
@@ -263,3 +263,14 @@ viewer list every 30 s, so a restarted agents service learns it again. Web PubSu
 connect and disconnect event handlers would be exact, but they need a public webhook
 endpoint with validation; the heartbeat needs nothing extra and the gateway runs one
 replica (D27).
+
+### D32. Default models: gpt-5.4 and gpt-5.4-mini
+The defaults were `gpt-4.1` and `gpt-4.1-mini` (2025-04-14). By October 2026 both are
+Deprecated in Foundry, which blocks new deployments for any subscription that has never
+deployed that version, so a fresh subscription could not provision them. The defaults are
+now `gpt-5.4` (2026-03-05) and `gpt-5.4-mini` (2026-03-17): GA, Global Standard in every
+Americas and Europe region, retiring in September 2027. They are reasoning models and
+reject `temperature`, so Foundry agents send `reasoning.effort` instead
+(`PITCHSIDE_REASONING_EFFORT`, default `low`, to stay inside the latency budget); other
+models keep a temperature of 0.4. An older subscription can still set `MODEL_LARGE` and
+`MODEL_SMALL` (and the versions in `infra/main.bicep`) back to 4.1.

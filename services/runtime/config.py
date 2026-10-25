@@ -27,6 +27,8 @@ class Settings:
     openai_compat_api_key: str
     llm: Literal["foundry", "openai", "mock"]
     model_timeout_s: float
+    # Reasoning models (gpt-5.x, o-series) take an effort level instead of a temperature.
+    reasoning_effort: Literal["none", "low", "medium", "high"]
     # Azure resources (managed identity; no keys).
     eventhubs_namespace: str
     cosmos_endpoint: str
@@ -54,6 +56,10 @@ class Settings:
         else:
             llm = "mock"
         origins = _env("PITCHSIDE_ALLOWED_ORIGINS", "*")
+        effort_env = _env("PITCHSIDE_REASONING_EFFORT", "low")
+        effort: Literal["none", "low", "medium", "high"] = (
+            effort_env if effort_env in ("none", "low", "medium", "high") else "low"  # type: ignore[assignment]
+        )
         return cls(
             mode=mode,
             data_dir=Path(_env("PITCHSIDE_DATA_DIR", str(REPO_ROOT / "data" / "runtime"))),
@@ -65,6 +71,7 @@ class Settings:
             openai_compat_api_key=_env("OPENAI_COMPAT_API_KEY"),
             llm=llm,
             model_timeout_s=float(_env("PITCHSIDE_MODEL_TIMEOUT_S", "4")),
+            reasoning_effort=effort,
             eventhubs_namespace=_env("EVENTHUBS_NAMESPACE"),
             cosmos_endpoint=_env("COSMOS_ENDPOINT"),
             cosmos_database=_env("COSMOS_DATABASE", "pitchside"),

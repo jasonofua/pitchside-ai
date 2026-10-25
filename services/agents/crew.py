@@ -80,6 +80,28 @@ async def record_tool_calls(
         record.calls.append((context.function.name, args, _parse_result(context.result)))
 
 
+def is_reasoning_model(model: str) -> bool:
+    """gpt-5.x (except the -chat variants) and the o-series reject temperature."""
+    name = model.lower()
+    if name.startswith("gpt-5"):
+        return "-chat" not in name
+    return name[:2] in ("o1", "o3", "o4")
+
+
+def model_options(settings: Settings, model: str) -> dict[str, Any] | None:
+    """Per-model defaults: a low reasoning effort keeps reasoning models inside the
+    latency budget; other models get a modest temperature. The effort goes through the
+    Responses API (Foundry); the chat-completions client has no reasoning option, so a
+    reasoning model behind an OpenAI-compatible endpoint keeps its server defaults."""
+    if settings.llm == "mock":
+        return None
+    if is_reasoning_model(model):
+        if settings.llm == "foundry":
+            return {"reasoning": {"effort": settings.reasoning_effort}}
+        return None
+    return {"temperature": 0.4}
+
+
 def chat_client(settings: Settings, size: str, role: str) -> Any:
     deployment = settings.model_large if size == "large" else settings.model_small
     if settings.llm == "mock":
@@ -163,7 +185,7 @@ class Crew:
                 description=f"Pitchside AI {name.replace('_', ' ')} ({prompt.ref})",
                 tools=tools or None,
                 middleware=[record_tool_calls],
-                default_options={"temperature": 0.4} if self.settings.llm != "mock" else None,
+                default_options=model_options(self.settings, self.model_name(name)),
             )
             await agent.open()
             self.agents[name] = agent
