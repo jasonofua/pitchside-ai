@@ -54,7 +54,7 @@ async def watch(http: httpx.AsyncClient, match_id: str, viewer: Viewer, t0: floa
     neg.raise_for_status()
     info = neg.json()
     viewer.protocol = info["protocol"]
-    subprotocols = [] if info["protocol"] == "plain" else [Subprotocol(info["protocol"])]
+    subprotocols = None if info["protocol"] == "plain" else [Subprotocol(info["protocol"])]
 
     async def heartbeat() -> None:
         body = {"profile": viewer.profile.model_dump(exclude_none=True)}
