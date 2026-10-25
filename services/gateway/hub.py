@@ -4,6 +4,10 @@ Each browser subscribes to one match with one profile. Tracking frames, events, 
 snapshots and match status go to everyone watching the match; overlay cards only to the
 viewers whose profile they were written for; agent traces only to Director panels.
 Active profiles are announced on the `control` topic so the agents know whom to write for.
+
+Viewers connected through Azure Web PubSub never reach this process, so they register
+their profile when they negotiate and then send a heartbeat (`touch`); a viewer whose
+heartbeat stops is dropped after VIEWER_TTL_S.
 """
 
 from __future__ import annotations
@@ -12,6 +16,7 @@ import asyncio
 import contextlib
 import json
 import logging
+import time
 from collections import defaultdict, deque
 from collections.abc import AsyncIterator, Awaitable, Callable
 from dataclasses import dataclass, field
@@ -37,6 +42,8 @@ RECENT_OVERLAYS = 30
 RECENT_EVENTS = 40
 RECENT_TRACES = 60
 MAX_FRAMES_PER_S = 25  # tracking sent to browsers per second of wall time; the pitch interpolates
+VIEWER_TTL_S = 90.0  # a Web PubSub viewer without a heartbeat for this long has left
+ANNOUNCE_EVERY_S = 30.0  # re-announce viewers so a restarted agents service learns them again
 
 
 def tracking_stride(match: dict[str, Any] | None) -> int:
@@ -89,18 +96,30 @@ class Hub:
         self.bus = bus
         self.clients: dict[str, set[Client]] = defaultdict(set)
         self.cache: dict[str, MatchCache] = defaultdict(MatchCache)
+        self.viewers: dict[str, dict[str, tuple[Profile, float]]] = defaultdict(dict)
         self._announced: dict[str, tuple[str, ...]] = {}
         self._frames: dict[str, int] = defaultdict(int)
 
     # --------------------------------------------------------------- clients
 
     def active_profiles(self, match_id: str) -> dict[str, Profile]:
-        return {c.profile_hash: c.profile for c in self.clients.get(match_id, ())}
+        cutoff = time.monotonic() - VIEWER_TTL_S
+        viewers = self.viewers.get(match_id, {})
+        profiles = {h: p for h, (p, seen) in viewers.items() if seen > cutoff}
+        profiles.update({c.profile_hash: c.profile for c in self.clients.get(match_id, ())})
+        return profiles
 
-    async def _announce(self, match_id: str) -> None:
+    async def touch(self, match_id: str, profile: Profile) -> str:
+        """Register (or keep alive) a viewer that is not connected to this process."""
+        h = profile_hash(profile)
+        self.viewers[match_id][h] = (profile, time.monotonic())
+        await self._announce(match_id)
+        return h
+
+    async def _announce(self, match_id: str, force: bool = False) -> None:
         profiles = self.active_profiles(match_id)
         key = tuple(sorted(profiles))
-        if self._announced.get(match_id) == key:
+        if not force and self._announced.get(match_id) == key:
             return
         self._announced[match_id] = key
         await self.bus.publish("control", match_id, {
@@ -178,12 +197,35 @@ class Hub:
             except Exception:
                 log.exception("hub failed to route a %s message", topic)
 
+    async def refresh(self) -> None:
+        """Drop viewers whose heartbeat stopped and re-announce every match with viewers."""
+        cutoff = time.monotonic() - VIEWER_TTL_S
+        for match_id in list(self.viewers):
+            alive = {h: v for h, v in self.viewers[match_id].items() if v[1] > cutoff}
+            if alive:
+                self.viewers[match_id] = alive
+            else:
+                del self.viewers[match_id]
+        for match_id in set(self.viewers) | set(self.clients) | set(self._announced):
+            await self._announce(match_id, force=True)
+            if not self.active_profiles(match_id):
+                self._announced.pop(match_id, None)
+
+    async def _refresh_loop(self) -> None:
+        while True:
+            await asyncio.sleep(ANNOUNCE_EVERY_S)
+            try:
+                await self.refresh()
+            except Exception:
+                log.exception("hub failed to refresh viewers")
+
     async def run(self) -> None:
         # Subscribe before the first await so nothing published after start is missed.
         subs = {topic: self.bus.subscribe(topic, "gateway") for topic in FORWARD}
         async with asyncio.TaskGroup() as tg:
             for topic, messages in subs.items():
                 tg.create_task(self._consume(topic, messages))
+            tg.create_task(self._refresh_loop())
 
     def snapshot(self, match_id: str, profile_hash: str, admin: bool = False) -> dict[str, Any]:
         """The same data as the WebSocket hello, for clients that connect elsewhere."""

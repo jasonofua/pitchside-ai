@@ -124,3 +124,45 @@ def test_tracking_is_thinned_for_fast_replays() -> None:
     assert tracking_stride({"speed": 5}) == 1
     assert tracking_stride({"speed": 20}) == 4
     assert tracking_stride({"speed": 0}) == 1
+
+
+def test_web_pubsub_viewers_are_announced_until_their_heartbeat_stops(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Viewers on Web PubSub never connect to the gateway: they register by heartbeat."""
+    import asyncio
+
+    from gateway import hub as hub_module
+    from runtime.bus import LocalBus
+
+    now = [1_000.0]
+    monkeypatch.setattr(hub_module.time, "monotonic", lambda: now[0])
+    viewer = Profile(mode="casual", language="pcm", favorite_club="LAG")
+
+    async def scenario() -> list[list[str]]:
+        bus = LocalBus()
+        control = bus.subscribe("control", "agents")
+        hub = hub_module.Hub(bus)
+        assert await hub.touch("m1", viewer) == profile_hash(viewer)
+        await hub.touch("m1", viewer)  # a heartbeat with nothing new announces nothing
+        now[0] += hub_module.VIEWER_TTL_S - 1
+        await hub.refresh()  # still alive: re-announced for a restarted agents service
+        now[0] += 2
+        await hub.refresh()  # heartbeat stopped: announced empty, then forgotten
+        await hub.refresh()
+        await bus.close()
+        return [[p["hash"] for p in m.data["profiles"]] async for m in control]
+
+    h = profile_hash(viewer)
+    assert asyncio.run(scenario()) == [[h], [h], []]
+
+
+def test_viewer_heartbeat_registers_the_profile(client: TestClient) -> None:
+    viewer = Profile(mode="player_cam", language="yo", favorite_player="LAG-09")
+    res = client.post("/api/matches/hb-test/viewers", json={"profile": viewer.model_dump()})
+    assert res.status_code == 200
+    assert res.json()["profile_hash"] == profile_hash(viewer)
+    hub = client.app.state.hub  # type: ignore[attr-defined]
+    assert set(hub.active_profiles("hb-test")) == {profile_hash(viewer)}
+    bad = client.post("/api/matches/hb-test/viewers", json={"profile": {"mode": "nope"}})
+    assert bad.status_code == 422

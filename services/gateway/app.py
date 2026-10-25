@@ -26,7 +26,7 @@ from pydantic import BaseModel, Field, ValidationError
 from starlette.websockets import WebSocketDisconnect
 
 from contracts import Profile, World
-from gateway.hub import Hub, make_client
+from gateway.hub import VIEWER_TTL_S, Hub, make_client
 from gateway.readers import StatsReader, StatsUnavailableError
 from runtime.bus import Bus
 from runtime.config import REPO_ROOT, Settings
@@ -60,6 +60,10 @@ class ChaosRequest(BaseModel):
 class FaultRequest(BaseModel):
     kind: Literal["wrong_number"] = "wrong_number"
     count: int = Field(default=1, ge=1, le=5)
+
+
+class ViewerHeartbeat(BaseModel):
+    profile: Profile
 
 
 def parse_profile(raw: str | None) -> Profile:
@@ -261,6 +265,8 @@ def create_app(
         if settings.webpubsub_endpoint:
             from gateway.webpubsub import client_url
 
+            if hub is not None:  # the agents write for this viewer from now on
+                await hub.touch(match_id, prof)
             url = await client_url(settings, match_id, profile_hash(prof), admin)
             return {"url": url, "protocol": "json.webpubsub.azure.v1",
                     "profile_hash": profile_hash(prof)}  # fmt: skip
@@ -272,6 +278,13 @@ def create_app(
         query = urllib.parse.urlencode(params)
         return {"url": f"{scheme}://{host}/ws/matches/{match_id}?{query}", "protocol": "plain",
                 "profile_hash": profile_hash(prof)}  # fmt: skip
+
+    @app.post("/api/matches/{match_id}/viewers")
+    async def viewer_heartbeat(match_id: str, req: ViewerHeartbeat) -> dict[str, Any]:
+        """Web PubSub viewers call this every 30 s so the agents keep writing for them."""
+        if hub is None:
+            raise HTTPException(404, "no live hub in this process")
+        return {"profile_hash": await hub.touch(match_id, req.profile), "ttl_s": VIEWER_TTL_S}
 
     # ---------------------------------------------------------------- admin
 

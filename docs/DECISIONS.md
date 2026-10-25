@@ -252,3 +252,14 @@ mode can afford.
 Per the spec's cut order, the audio recap (Azure AI Speech) and the A2A endpoint for the
 Fan Lens were not built. Everything the spec says never to cut (Three Fans, Fact Checker,
 Azure deployment templates) is in.
+
+### D31. Web PubSub viewers register by heartbeat
+The agents write cards only for profiles that are watching. Locally the gateway sees
+every viewer's WebSocket; in Azure mode browsers connect straight to Web PubSub, so the
+gateway would never learn of them and no cards would be written. A viewer is therefore
+registered when it negotiates, and the browser sends `POST /api/matches/{id}/viewers` every
+30 s while connected; a viewer silent for 90 s is dropped. The gateway re-announces the
+viewer list every 30 s, so a restarted agents service learns it again. Web PubSub's
+connect and disconnect event handlers would be exact, but they need a public webhook
+endpoint with validation; the heartbeat needs nothing extra and the gateway runs one
+replica (D27).

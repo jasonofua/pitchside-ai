@@ -44,6 +44,7 @@ export interface MatchStream {
 const MAX_EVENTS = 60;
 const MAX_TRACES = 120;
 const MAX_DISPLAY_MS = 30_000;
+const HEARTBEAT_MS = 30_000; // the gateway forgets a Web PubSub viewer after 90 s of silence
 
 function displayMs(card: OverlayCard, speed: number): number {
   // ttl_ms is match time (reading time x playback speed); show the reading time.
@@ -84,6 +85,11 @@ export function useMatchStream(
     let closed = false;
     let retry = 0;
     let timer: ReturnType<typeof setTimeout> | null = null;
+    let heartbeat: ReturnType<typeof setInterval> | null = null;
+    const stopHeartbeat = () => {
+      if (heartbeat) clearInterval(heartbeat);
+      heartbeat = null;
+    };
 
     const addOverlay = (card: OverlayCard, receivedAt = performance.now()) => {
       setOverlays((list) => {
@@ -152,6 +158,10 @@ export function useMatchStream(
           retry = 0;
           setStatus("live");
           if (neg.protocol !== "plain") {
+            // The gateway cannot see Web PubSub connections: tell it every 30 s that this
+            // viewer is still here, or the agents stop writing cards for this profile.
+            stopHeartbeat();
+            heartbeat = setInterval(() => void api.heartbeat(matchId, prof).catch(() => undefined), HEARTBEAT_MS);
             // Web PubSub does not push a hello; fetch the same snapshot over REST.
             try {
               const res = await fetch(
@@ -176,6 +186,7 @@ export function useMatchStream(
           if (inner && typeof inner === "object" && "type" in inner) handle(inner);
         };
         ws.onclose = () => {
+          stopHeartbeat();
           if (closed) return;
           setStatus("closed");
           retry += 1;
@@ -193,6 +204,7 @@ export function useMatchStream(
     return () => {
       closed = true;
       if (timer) clearTimeout(timer);
+      stopHeartbeat();
       ws?.close();
       setOverlays([]);
       setEvents([]);

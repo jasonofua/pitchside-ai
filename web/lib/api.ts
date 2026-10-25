@@ -87,6 +87,11 @@ export const api = {
   fault: (count = 1) =>
     call<unknown>("/api/admin/fault", { method: "POST", body: JSON.stringify({ kind: "wrong_number", count }) }),
   adminStatus: () => call<Record<string, unknown>>("/api/admin/status"),
+  heartbeat: (id: string, profile: Profile) =>
+    call<{ profile_hash: string; ttl_s: number }>(`${m(id)}/viewers`, {
+      method: "POST",
+      body: JSON.stringify({ profile }),
+    }),
   negotiate: (id: string, profile: Profile, admin = false) =>
     call<{ url: string; protocol: "plain" | "json.webpubsub.azure.v1"; profile_hash: string }>(
       `/api/negotiate?match_id=${encodeURIComponent(id)}&profile=${encodeURIComponent(JSON.stringify(profile))}${admin ? "&admin=true" : ""}`,
