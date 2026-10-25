@@ -43,8 +43,11 @@ def configure_logging() -> None:
         level=os.environ.get("PITCHSIDE_LOG_LEVEL", "INFO"),
         format="%(asctime)s %(levelname)s %(name)s: %(message)s",
     )
-    for noisy in ("httpx", "mcp", "mcp.server", "mcp.client", "agent_framework", "uvicorn.access"):
-        logging.getLogger(noisy).setLevel(logging.WARNING)
+    # "azure" includes the SDKs' per-request HTTP logging, which App Insights would export too.
+    noisy = ("httpx", "mcp", "mcp.server", "mcp.client", "agent_framework", "uvicorn.access",
+             "azure")  # fmt: skip
+    for name in noisy:
+        logging.getLogger(name).setLevel(logging.WARNING)
 
 
 def make_bus(settings: Settings) -> Bus:
@@ -76,7 +79,7 @@ def setup_telemetry(settings: Settings) -> None:
         configure_azure_monitor(
             connection_string=settings.appinsights_connection_string,
             credential=DefaultAzureCredential(),
-            logger_name="pitchside",
+            logger_name="",  # the root logger: every module's logs, not just "pitchside"
         )
         enable_instrumentation()
 

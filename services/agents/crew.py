@@ -93,13 +93,26 @@ def chat_client(settings: Settings, size: str, role: str) -> Any:
             api_key=settings.openai_compat_api_key or "not-needed",
         )
     from agent_framework.foundry import FoundryChatClient
-    from azure.identity.aio import DefaultAzureCredential
 
     return FoundryChatClient(
         project_endpoint=settings.foundry_endpoint,
         model=deployment,
-        credential=DefaultAzureCredential(),
+        credential=_azure_credential(),
     )
+
+
+_credential: Any = None
+
+
+def _azure_credential() -> Any:
+    """One managed-identity credential for every agent's client (each would otherwise open
+    its own HTTP session, again on every start retry)."""
+    global _credential
+    if _credential is None:
+        from azure.identity.aio import DefaultAzureCredential
+
+        _credential = DefaultAzureCredential()
+    return _credential
 
 
 class Crew:

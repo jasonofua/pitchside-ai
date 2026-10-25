@@ -83,6 +83,9 @@ class EventHubsBus:
             if queue.full():
                 queue.get_nowait()
             queue.put_nowait(Message(topic, key, data))
+            # In-memory checkpoint: when a partition is reclaimed after a link error, it
+            # resumes after this event instead of at "@latest" (losing whatever came between).
+            await partition.update_checkpoint(event)
 
         async def pump() -> None:
             async with consumer:
