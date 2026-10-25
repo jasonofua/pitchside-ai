@@ -163,15 +163,54 @@ cards in sync.
   (swap and a load average near 40); nothing in the code was implicated, and runs at normal
   load keep their speed.
 
+## Day 8 prep — shipping checks (worked Oct 24-25)
+
+**Done**
+- Built the Docker image locally for the first time (the disk had room again) and ran local
+  mode with `docker compose up`. That found a crash CI could not: source files that were
+  0600 on this machine were unreadable by the container's non-root user, and azd's remote
+  build uploads the working tree as is. The Dockerfile now makes the app readable.
+- `scripts/smoke_live.py`: starts a match, connects the three demo viewers the way the
+  browser does (local WebSocket, or Web PubSub plus heartbeat in Azure mode), follows it to
+  full time and reports cards per viewer, agent outcomes and the recap. In the container
+  at 20×: 122 cards (89 written by the agents), every agent step ok, recap written.
+- A review of the Azure-only code paths (never run, since there is no subscription here)
+  found and fixed:
+  - Web PubSub viewers were never announced to the agents, so no cards would have been
+    written in Azure mode. Viewers now register by heartbeat (D31).
+  - Web PubSub messages were JSON-encoded twice and dropped by the browser. The hub now
+    sends objects, and tracking is latest-wins so a slow send cannot build up lag.
+  - The placeholder image failed the health probe on port 8000 during the first provision,
+    and every re-provision reset the apps to it. Apps now keep the image azd deployed
+    (`SERVICE_<NAME>_IMAGE_NAME`) and skip probes on the placeholder.
+  - Event Hubs partitions resumed at "latest" after a link error, losing events in the
+    gap. Checkpoints now go to the in-memory store.
+  - App Insights got only the `pitchside` logger; it now gets every module's logs, with
+    Azure SDK request logging kept at WARNING. The Foundry clients share one credential.
+  - `PITCHSIDE_FOUNDRY_LOCATION` used a nested default that azd may not expand.
+- Public repo: https://github.com/jasonofua/pitchside-ai.
+
+**Broken / not done**
+- GitHub Actions did not start: "account is locked due to a billing issue". Fix it under
+  github.com/settings/billing, then re-run CI. Every CI check passed locally.
+- Still not deployed. Known risks on the first `azd up`:
+  - Role grants can take minutes to apply, so expect early 401/403s. Apps now start after
+    the grants exist, and re-running `azd up` settles it.
+  - Model version and quota availability in your region.
+  - With `PITCHSIDE_DEPLOY_FOUNDRY=false`, grant the identity Azure AI User on your
+    project yourself.
+- `python -m sim run --sink eventhubs` from a laptop needs an Event Hubs Data Sender grant
+  for your user (only the managed identity has one). It is not used by the demo.
+
 ## Day 8 — ship: what is left for the owner
 
-1. **GitHub:** create the public repo and push (`gh repo create pitchside-ai --public
-   --source . --push`); CI runs on push.
-2. **Azure:** `azd auth login`, then `azd env set PITCHSIDE_BUDGET_EMAIL <you>` and `azd up`.
-   If the default models are not available in your region, set `MODEL_LARGE`,
-   `MODEL_SMALL` (and the versions in `infra/main.bicep`) or `PITCHSIDE_FOUNDRY_LOCATION`.
-   Then run three matches at 5× from the demo URL and check App Insights for traces
-   (screenshot for the README).
+1. **GitHub:** done (public). Fix the Actions billing lock so CI runs.
+2. **Azure:** `azd auth login`, `azd env new pitchside`, `azd env set PITCHSIDE_BUDGET_EMAIL
+   <you>`, then `azd up`. If the default models are not available in your region, set
+   `MODEL_LARGE`, `MODEL_SMALL` (and the versions in `infra/main.bicep`) or
+   `PITCHSIDE_FOUNDRY_LOCATION`. Then check the demo with
+   `uv run python scripts/smoke_live.py <gateway URL> --speed 5`, and take a screenshot of
+   an App Insights trace for the README.
 3. **Evals on real models:** `FOUNDRY_ENDPOINT=... MODEL_LARGE=... MODEL_SMALL=... uv run
    python -m evals.run`, and have a native speaker review
    `evals/results/language_samples.md` (corrections go into

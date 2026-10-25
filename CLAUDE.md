@@ -36,6 +36,7 @@ uv run python scripts/gen_world.py        # regenerate data/world.json and crest
 uv run python -m sim run --seed 42 --speed 5 --format pretty   # watch a match
 uv run python -m runtime.main             # everything locally on :8000 (serves web/out)
 uv run python scripts/explain_match.py --scenario comeback     # agents in the terminal
+uv run python scripts/smoke_live.py http://localhost:8000      # end-to-end check (any URL)
 uv run python -m evals.run                # agent evals over 30 seeded moments
 (cd web && pnpm build && pnpm test:e2e)   # site build; Playwright needs a running gateway
 docker compose up --build                 # local mode in one container

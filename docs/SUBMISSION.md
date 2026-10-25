@@ -1,9 +1,9 @@
 # Submission: Pitchside AI
 
 Copy for the hackathon site. Category: **Best Multi-Agent System** (secondary fit: Azure
-Cloud Native). Replace the two links before submitting.
+Cloud Native). Replace the demo and video links before submitting.
 
-- **Repo:** https://github.com/<owner>/pitchside-ai (public, MIT)
+- **Repo:** https://github.com/jasonofua/pitchside-ai (public, MIT)
 - **Live demo (no login):** <GATEWAY_URL from `azd up`>
 - **Video (1:55):** <YouTube link>
 
@@ -53,7 +53,7 @@ the chaos switch or inject a wrong number and watch the Fact Checker catch it. A
 *Recap* has the story, five key moments, player of the match and a JSON export for
 broadcast tooling.
 
-**Engineering.** Python 3.12 (uv, ruff, mypy strict, pytest: ~300 tests), Next.js with
+**Engineering.** Python 3.12 (uv, ruff, mypy strict, pytest: 320+ tests), Next.js with
 TypeScript strict; one set of JSON Schemas generates both the Python models and the
 TypeScript types. Agent evals score every agent over 30 seeded moments (number accuracy,
 mode rules, language, Fact Checker recall). Local mode runs with `docker compose up` and no
