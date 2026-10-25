@@ -9,11 +9,12 @@ right group.
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from collections.abc import AsyncIterator
 from typing import Any
 
-from gateway.hub import Hub, envelope, tracking_stride
+from gateway.hub import Hub, tracking_stride
 from runtime.bus import Bus, Message, Topic
 from runtime.config import Settings
 
@@ -64,14 +65,34 @@ class WebPubSubHub(Hub):
     def __init__(self, bus: Bus, settings: Settings) -> None:
         super().__init__(bus)
         self.settings = settings
+        self._latest_frame: dict[str, tuple[str, dict[str, Any]]] = {}
+        self._frame_senders: dict[str, asyncio.Task[None]] = {}
 
-    async def _send(self, group: str, text: str) -> None:
+    async def _send(self, group: str, payload: dict[str, Any]) -> None:
+        # Pass the dict: with content_type JSON the SDK serializes the body itself, so a
+        # string would arrive in the browser double-encoded (and be ignored).
         try:
             await _service(self.settings).send_to_group(
-                group, text, content_type="application/json"
+                group, payload, content_type="application/json"
             )
         except Exception:
             log.exception("web pubsub send to %s failed", group)
+
+    def _send_frame(self, match_id: str, group: str, payload: dict[str, Any]) -> None:
+        """Tracking is latest-wins: one send in flight per match, and a frame that arrives
+        meanwhile replaces the waiting one, so a slow REST call never builds up lag."""
+        self._latest_frame[match_id] = (group, payload)
+        if match_id in self._frame_senders:
+            return
+
+        async def drain() -> None:
+            try:
+                while match_id in self._latest_frame:
+                    await self._send(*self._latest_frame.pop(match_id))
+            finally:
+                self._frame_senders.pop(match_id, None)
+
+        self._frame_senders[match_id] = asyncio.create_task(drain())
 
     async def deliver(self, msg: Message) -> None:
         self.route(msg)  # keeps the cache that /api/matches/{id}/live serves
@@ -86,14 +107,17 @@ class WebPubSubHub(Hub):
             stride = max(TRACKING_EVERY, tracking_stride(self.cache[msg.key].match))
             if n % stride:
                 return
-        text = envelope(kind, msg.data)
+        payload = {"type": kind, "data": msg.data}
+        if msg.topic == "tracking":
+            self._send_frame(msg.key, group_match(msg.key), payload)
+            return
         if msg.topic == "overlays":
             group = group_profile(msg.key, str(msg.data.get("audience_profile_hash", "")))
         elif msg.topic == "trace":
             group = group_admin(msg.key)
         else:
             group = group_match(msg.key)
-        await self._send(group, text)
+        await self._send(group, payload)
 
     async def _consume(self, topic: Topic, messages: AsyncIterator[Message]) -> None:
         async for msg in messages:

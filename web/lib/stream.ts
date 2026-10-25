@@ -182,7 +182,14 @@ export function useMatchStream(
           }
           const outer = parsed as { type?: string; data?: unknown };
           // Web PubSub wraps our envelope: {type:"message", data:{type, data}}.
-          const inner = outer.type === "message" ? (outer.data as StreamMessage) : (parsed as StreamMessage);
+          let inner = outer.type === "message" ? (outer.data as StreamMessage) : (parsed as StreamMessage);
+          if (typeof inner === "string") {
+            try {
+              inner = JSON.parse(inner) as StreamMessage;
+            } catch {
+              return;
+            }
+          }
           if (inner && typeof inner === "object" && "type" in inner) handle(inner);
         };
         ws.onclose = () => {
